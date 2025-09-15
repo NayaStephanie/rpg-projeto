@@ -83,7 +83,10 @@ class LoginScreen extends StatelessWidget {
                       fontSize: 20,
                     ),
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    // Quando clicar em 'Entrar', vai para a tela HomeScreen
+                    Navigator.pushReplacementNamed(context, '/home');
+                  },
                   child: const Text("ENTRAR"),
                 ),
                 const SizedBox(height: 45),

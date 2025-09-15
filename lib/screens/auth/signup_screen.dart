@@ -124,7 +124,8 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                   ),
                   onPressed: () {
-                    // ação de cadastro
+                    // Quando cadastrar, volta para a tela de login
+                    Navigator.pop(context);
                   },
                   child: const Text("CADASTRAR"),
                 ),

@@ -1,23 +1,85 @@
 import 'package:flutter/material.dart';
-import '../../utils/app_routes.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:app_rpg/screens/about/about_screen.dart';
 
-/// Tela inicial após login
-/// Mostra opções para criar personagem
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Home")),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            Navigator.pushNamed(context, AppRoutes.races);
-          },
-          child: const Text("Criar Personagem"),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          // Fundo com imagem ocupando toda a tela
+          Positioned.fill(
+            child: 
+            Image.asset(
+              "lib/assets/images/image_dracon_inicio.png", // caminho novo
+              fit: BoxFit.cover,
+            ),
+          ),
+
+           // Overlay para deixar a imagem mais escura e facilitar leitura
+          Container(
+            color: Colors.black.withOpacity(0.65),
+          ),
+
+          // Conteúdo
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 80),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text(
+                  "RPGo!",
+                  style: GoogleFonts.jimNightshade(
+                    fontSize: 60,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 70),
+                _buildMenuButton(context, "Personagens", () {}),
+                const SizedBox(height: 50),
+                _buildMenuButton(context, "Criar", () {}),
+                const SizedBox(height: 50),
+                _buildMenuButton(context, "Suporte", () {}),
+
+                const SizedBox(height: 50),
+                _buildMenuButton(context, "Sobre o App", () {
+                  Navigator.push(context, MaterialPageRoute(
+                    builder: (context) => const AboutScreen(),
+                  ));
+                }),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMenuButton(
+      BuildContext context, String text, VoidCallback onTap) {
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xFF767676).withOpacity( 0.35),
+        foregroundColor: Colors.white,
+        minimumSize: const Size(240, 80),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
         ),
+        textStyle: GoogleFonts.jimNightshade(
+          fontSize: 40,
+          fontWeight: FontWeight.w400,
+        ),
+      ),
+      onPressed: onTap,
+      child: Text(
+        text,
       ),
     );
   }
 }
+
