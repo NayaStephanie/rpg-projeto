@@ -5,4 +5,5 @@ class AppRoutes {
   static const home = '/home';
   static const races = '/races';
   static const about = '/about';
+  static const recuperarSenha = '/recuperarSenha'; // Rota para a tela de Recuperar Senha
 }

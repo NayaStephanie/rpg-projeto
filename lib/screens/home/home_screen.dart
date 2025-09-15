@@ -34,7 +34,7 @@ class HomeScreen extends StatelessWidget {
                 Text(
                   "RPGo!",
                   style: GoogleFonts.jimNightshade(
-                    fontSize: 60,
+                    fontSize: 80,
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),
