@@ -55,7 +55,6 @@ class _AboutScreenState extends State<AboutScreen> {
                     'Sobre o Projeto',
                     style: GoogleFonts.jimNightshade(
                       fontSize: 60,
-                      fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
                     textAlign: TextAlign.center,
@@ -78,8 +77,8 @@ Equipe de desenvolvimento:
 
 Que este artefato seja útil em suas campanhas, e que os dados sempre rolem a seu favor!
                         ''',
-                        style: GoogleFonts.cinzel(
-                          fontSize: 18,
+                        style: GoogleFonts.imFellEnglish(
+                          fontSize: 26,
                           height: 2,
                           color: Colors.white70,
                         ),
@@ -92,7 +91,8 @@ Que este artefato seja útil em suas campanhas, e que os dados sempre rolem a se
                   if (_showButton)
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF767676),
+                        // ignore: deprecated_member_use
+                        backgroundColor: const Color(0xFF767676).withOpacity(0.35),
                         foregroundColor: Colors.white,
                         minimumSize: const Size(double.infinity, 65),
                         shape: RoundedRectangleBorder(
@@ -108,9 +108,8 @@ Que este artefato seja útil em suas campanhas, e que os dados sempre rolem a se
                       },
                       child: Text(
                         'Voltar',
-                        style: GoogleFonts.cinzel(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                        style: GoogleFonts.imFellEnglish(
+                          fontSize: 26,
                           color: Colors.white,
                         ),
                       ),

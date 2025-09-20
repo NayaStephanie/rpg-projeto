@@ -1,13 +1,11 @@
-/// Modelo de dados para representar uma Raça
-class Race {
+class Classe {
   final String name;
   final String description;
   final String icon;
 
-  Race({
+  Classe({
     required this.name,
     required this.description,
     required this.icon,
   });
 }
-

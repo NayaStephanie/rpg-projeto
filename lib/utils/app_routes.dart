@@ -5,5 +5,7 @@ class AppRoutes {
   static const home = '/home';
   static const races = '/races';
   static const about = '/about';
-  static const recuperarSenha = '/recuperarSenha'; // Rota para a tela de Recuperar Senha
+  static const recuperarSenha = '/recuperarSenha';
+  static const raceDetail = '/raceDetail';
+  static const classScreen = '/classScreen';
 }

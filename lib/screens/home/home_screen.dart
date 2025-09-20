@@ -1,6 +1,9 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:app_rpg/screens/about/about_screen.dart';
+import 'package:app_rpg/screens/character/race_list_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -36,13 +39,39 @@ class HomeScreen extends StatelessWidget {
                   style: GoogleFonts.jimNightshade(
                     fontSize: 80,
                     color: Colors.white,
-                    fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(height: 70),
-                _buildMenuButton(context, "Personagens", () {}),
+                _buildMenuButton(context, "Personagens", () {
+                  Navigator.push(context, MaterialPageRoute(
+                    builder: (context) => const RaceScreen(),
+                  ));
+                }),
                 const SizedBox(height: 50),
-                _buildMenuButton(context, "Criar", () {}),
+                _buildMenuButton(context, "Criar", () {
+                 Navigator.push(
+  context,
+  PageRouteBuilder(
+    transitionDuration: const Duration(milliseconds: 700), // tempo da animação
+    pageBuilder: (context, animation, secondaryAnimation) => const RaceScreen(),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      const begin = Offset(1.0, 0.0); // começa fora da tela, à direita
+      const end = Offset.zero;       // termina no centro (posição final)
+      final tween = Tween(begin: begin, end: end);
+      final curvedAnimation = CurvedAnimation(
+        parent: animation,
+        curve: Curves.easeInOut,     // suavidade
+      );
+
+      return SlideTransition(
+        position: tween.animate(curvedAnimation),
+        child: child,
+      );
+    },
+  ),
+);
+
+                }),
                 const SizedBox(height: 50),
                 _buildMenuButton(context, "Suporte", () {}),
 

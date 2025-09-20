@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -10,6 +12,13 @@ class SignupScreen extends StatefulWidget {
 
 class _SignupScreenState extends State<SignupScreen> {
   String storageOption = "local"; // valor padrão
+
+  // Controllers para pegar valores dos campos
+  final TextEditingController nomeController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController telefoneController = TextEditingController();
+  final TextEditingController senhaController = TextEditingController();
+  final TextEditingController confirmarSenhaController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -35,29 +44,28 @@ class _SignupScreenState extends State<SignupScreen> {
                   style: GoogleFonts.jimNightshade(
                     fontSize: 60,
                     color: Colors.white,
-                    fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(height: 40),
 
                 // Nome de usuário
-                _buildTextField("Nome de Usuário"),
+                _buildTextField("Nome de Usuário", controller: nomeController),
                 const SizedBox(height: 20),
 
                 // Email
-                _buildTextField("Email"),
+                _buildTextField("Email", controller: emailController),
                 const SizedBox(height: 20),
 
                 // Número de telefone
-                _buildTextField("Número de telefone"),
+                _buildTextField("Número de telefone", controller: telefoneController),
                 const SizedBox(height: 20),
 
                 // Senha
-                _buildTextField("Senha", isPassword: true),
+                _buildTextField("Senha", controller: senhaController, isPassword: true),
                 const SizedBox(height: 20),
 
                 // Confirmar senha
-                _buildTextField("Confirmar Senha", isPassword: true),
+                _buildTextField("Confirmar Senha", controller: confirmarSenhaController, isPassword: true),
                 const SizedBox(height: 30),
 
                 // Opções de armazenamento
@@ -76,9 +84,9 @@ class _SignupScreenState extends State<SignupScreen> {
                     Expanded(
                       child: Text(
                         "Salvar localmente (grátis)",
-                        style: GoogleFonts.cinzel(
+                        style: GoogleFonts.imFellEnglish(
                           color: Colors.white,
-                          fontSize: 16,
+                          fontSize: 20,
                         ),
                       ),
                     ),
@@ -99,9 +107,9 @@ class _SignupScreenState extends State<SignupScreen> {
                     Expanded(
                       child: Text(
                         "Salvar na nuvem (premium)",
-                        style: GoogleFonts.cinzel(
+                        style: GoogleFonts.imFellEnglish(
                           color: Colors.white,
-                          fontSize: 16,
+                          fontSize: 20,
                         ),
                       ),
                     ),
@@ -112,22 +120,20 @@ class _SignupScreenState extends State<SignupScreen> {
                 // Botão Cadastrar
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF767676),
+                    backgroundColor: const Color(0xFF767676).withOpacity(0.35),
                     foregroundColor: Colors.white,
                     minimumSize: const Size(double.infinity, 65),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    textStyle: GoogleFonts.cinzel(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
+                    textStyle: GoogleFonts.imFellEnglish(
+                      fontSize: 26,
                     ),
                   ),
                   onPressed: () {
-                    // Quando cadastrar, volta para a tela de login
-                    Navigator.pop(context);
+                    _validarCadastro(context);
                   },
-                  child: const Text("CADASTRAR"),
+                  child: const Text("Cadastrar"),
                 ),
                 const SizedBox(height: 30),
 
@@ -137,11 +143,11 @@ class _SignupScreenState extends State<SignupScreen> {
                     Navigator.pop(context);
                   },
                   child: Text(
-                    "VOLTAR",
-                    style: GoogleFonts.cinzel(
-                      fontSize: 20,
+                    "Voltar",
+                    style: GoogleFonts.imFellEnglish(
+                      fontSize: 26,
                       color: Colors.white,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),
@@ -154,10 +160,11 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   // Widget auxiliar para criar campos de texto
-  Widget _buildTextField(String hint, {bool isPassword = false}) {
+  Widget _buildTextField(String hint, {bool isPassword = false, TextEditingController? controller}) {
     return TextField(
+      controller: controller,
       obscureText: isPassword,
-      style: GoogleFonts.cinzel(color: Colors.white, fontSize: 18),
+      style: GoogleFonts.imFellEnglish(color: Colors.white, fontSize: 18),
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: const TextStyle(color: Colors.white70),
@@ -169,5 +176,36 @@ class _SignupScreenState extends State<SignupScreen> {
         ),
       ),
     );
+  }
+
+  // Função para validar cadastro
+  void _validarCadastro(BuildContext context) {
+    String nome = nomeController.text.trim();
+    String email = emailController.text.trim();
+    String telefone = telefoneController.text.trim();
+    String senha = senhaController.text.trim();
+    String confirmarSenha = confirmarSenhaController.text.trim();
+
+    if (nome.isEmpty || email.isEmpty || telefone.isEmpty || senha.isEmpty || confirmarSenha.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Por favor, preencha todos os campos.")),
+      );
+      return;
+    }
+
+    if (senha != confirmarSenha) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("As senhas não coincidem.")),
+      );
+      return;
+    }
+
+    // Se passou na validação
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Cadastro realizado com sucesso!")),
+    );
+
+    // Depois pode salvar em banco de dados/local/nuvem
+    Navigator.pop(context);
   }
 }

@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:app_rpg/selection_manager.dart';
 
-class RaceDetailScreen extends StatelessWidget {
-  const RaceDetailScreen({super.key});
+class ClassDetailScreen extends StatelessWidget {
+  const ClassDetailScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final Map<String, String> race =
+    final Map<String, String> classData =
         ModalRoute.of(context)!.settings.arguments as Map<String, String>;
 
     return Scaffold(
@@ -55,8 +55,8 @@ class RaceDetailScreen extends StatelessWidget {
                         ),
                       ),
                       onPressed: () {
-                       // Salva a raça no ValueNotifier
-                        SelectionManager.selectedRace.value = race["name"];
+                       // Salva a classe no ValueNotifier
+                        SelectionManager.selectedClass.value = classData["name"];
                         Navigator.pop(context); // volta depois de selecionar
                       },
                       child: const Text("Selecionar"),
@@ -67,14 +67,14 @@ class RaceDetailScreen extends StatelessWidget {
 
               const SizedBox(height: 10),
 
-              // ===== Imagem da raça =====
-              Image.asset(race["img"]!, height: 80),
+              // ===== Imagem da classe =====
+              Image.asset(classData["img"]!, height: 80),
 
               const SizedBox(height: 10),
 
-              // ===== Nome da raça =====
+              // ===== Nome da classe =====
               Text(
-                race["name"]!,
+                classData["name"]!,
                 style: GoogleFonts.jimNightshade(
                   fontSize: 36,
                   color: Colors.white,

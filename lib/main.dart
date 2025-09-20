@@ -7,6 +7,8 @@ import 'screens/character/race_list_screen.dart';
 import 'screens/about/about_screen.dart';
 import 'package:device_preview/device_preview.dart';
 import 'package:app_rpg/screens/recuperar/recuperar_senha_screen.dart';
+import 'screens/character/race_detail_screen.dart';
+import 'screens/character/class_screen.dart';
 // ignore: unused_import
 import 'package:get_it/get_it.dart';
 
@@ -33,9 +35,11 @@ class MyApp extends StatelessWidget {
         AppRoutes.login: (_) => const LoginScreen(),
         AppRoutes.signup: (_) => const SignupScreen(),
         AppRoutes.home: (_) => const HomeScreen(),
-        AppRoutes.races: (_) => const RaceListScreen(),
-        AppRoutes.about: (_) => const AboutScreen(), // Substituído pela tela Sobre
-        AppRoutes.recuperarSenha: (_) => const RecuperarSenhaScreen(), // Adicionada a rota para Recuperar Senha
+        AppRoutes.races: (_) => const RaceScreen(),
+        AppRoutes.about: (_) => const AboutScreen(), 
+        AppRoutes.recuperarSenha: (_) => const RecuperarSenhaScreen(), 
+        AppRoutes.raceDetail: (_) => const RaceDetailScreen(),
+        AppRoutes.classScreen: (_) => const ClassScreen(),
       },
     );
   }

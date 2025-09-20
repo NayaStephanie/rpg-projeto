@@ -25,3 +25,5 @@ flutter:
 
   assets:
     - lib/assets/images/
+    - lib/assets/images/racas/
+    - lib/assets/images/classes/

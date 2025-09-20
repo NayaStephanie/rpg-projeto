@@ -1,112 +1,136 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class RecuperarSenhaScreen extends StatelessWidget {
+class RecuperarSenhaScreen extends StatefulWidget {
   const RecuperarSenhaScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final TextEditingController emailController = TextEditingController();
+  State<RecuperarSenhaScreen> createState() => _RecuperarSenhaScreenState();
+}
 
+class _RecuperarSenhaScreenState extends State<RecuperarSenhaScreen> {
+  final TextEditingController emailController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+
+  String? _validarEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return "Informe seu email";
+    }
+    final regex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+    if (!regex.hasMatch(value)) {
+      return "Digite um email válido";
+    }
+    return null;
+  }
+
+  void _enviar() {
+    if (_formKey.currentState!.validate()) {
+      // Aqui no futuro pode enviar requisição ao backend
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Um link de recuperação foi enviado para ${emailController.text}"),
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Fundo com imagem ou cor
+          // Fundo
           Image.asset(
-            "lib/assets/images/image_fundo.png", // use a mesma textura das outras telas
+            "lib/assets/images/image_fundo.png",
             fit: BoxFit.cover,
           ),
 
-
           // Conteúdo
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 80),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                // Título
-                Text(
-                  "Recuperar Senha",
-                  style: GoogleFonts.jimNightshade(
-                    fontSize: 60,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
+            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 165),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // Título
+                  Text(
+                    "Recuperar Senha",
+                    style: GoogleFonts.jimNightshade(
+                      fontSize: 60,
+                      color: Colors.white,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 70),
+                  const SizedBox(height: 70),
 
-                // Campo de email
-                TextField(
-                  controller: emailController,
-                  style: GoogleFonts.cinzel(color: Colors.white, fontSize: 18),
-                  decoration: InputDecoration(
-                    hintText: "Informe o Email de cadastro",
-                    hintStyle: const TextStyle(color: Colors.white70),
-                    filled: true,
-                    fillColor: Colors.black.withAlpha((0.20 * 255).toInt()),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: Colors.white),
+                  // Campo de email
+                  TextFormField(
+                    controller: emailController,
+                    style: GoogleFonts.imFellEnglish(
+                        color: Colors.white, fontSize: 18),
+                    decoration: InputDecoration(
+                      hintText: "Informe o email de cadastro",
+                      hintStyle: const TextStyle(color: Colors.white70),
+                      filled: true,
+                      fillColor: Colors.black.withAlpha((0.20 * 255).toInt()),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(color: Colors.white),
+                      ),
                     ),
+                    validator: _validarEmail,
                   ),
-                ),
-                const SizedBox(height: 50),
+                  const SizedBox(height: 50),
 
-                // Botão ENVIAR
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF767676),
-                    foregroundColor: Colors.white,
-                    minimumSize:  Size(double.infinity, 65),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    textStyle: GoogleFonts.cinzel(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                    ),
-                  ),
-                    onPressed: () {
-                      // depois você adiciona a lógica de verificação do email
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Verificação de email em desenvolvimento..."),
+                  // Botão ENVIAR
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            const Color(0xFF767676).withOpacity(0.35),
+                        foregroundColor: Colors.white,
+                        minimumSize: const Size(double.infinity, 65),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                      );
-                    },
-                    child: const Text("ENVIAR"),
-                  ),
-                ),
-
-                const SizedBox(height: 50),
-
-                // Botão VOLTAR
-                SizedBox(
-                  width: 150,
-                  child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF767676),
-                    foregroundColor: Colors.white,
-                    minimumSize: const Size(200, 65),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-
-                    ),
-                    textStyle: GoogleFonts.cinzel(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
+                        textStyle: GoogleFonts.imFellEnglish(
+                          fontSize: 26,
+                        ),
+                      ),
+                      onPressed: _enviar,
+                      child: const Text("Enviar"),
                     ),
                   ),
-                    onPressed: () {
-                      Navigator.pop(context); // volta para tela anterior
-                    },
-                    child: const Text("VOLTAR"),
+
+                  const SizedBox(height: 50),
+
+                  // Botão VOLTAR
+                  SizedBox(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            const Color(0xFF767676).withOpacity(0.35),
+                        foregroundColor: Colors.white,
+                        minimumSize: const Size(double.infinity, 65),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        textStyle: GoogleFonts.imFellEnglish(
+                          fontSize: 26,
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text("Voltar"),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ],
