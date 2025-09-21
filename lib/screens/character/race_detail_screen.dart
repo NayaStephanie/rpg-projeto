@@ -7,10 +7,86 @@ import 'package:app_rpg/selection_manager.dart';
 class RaceDetailScreen extends StatelessWidget {
   const RaceDetailScreen({super.key});
 
+  // Descrições originais adaptadas de D&D 5e
+  static final Map<String, String> raceDescriptions = {
+    "Meio-Elfo":
+        "Filhos de dois mundos, os meio-elfos combinam a adaptabilidade humana com a graça élfica. Costumam ser diplomáticos e versáteis, com facilidade para se encaixar em diferentes papéis.\n\n"
+        "Atributos aprimorados: +2 em Carisma e +1 em duas outras habilidades de sua escolha.\n\n"
+        "Deslocamento: 9 metros por rodada.\n\n"
+        "Visão no escuro: até 18 metros em tons de cinza.\n\n"
+        "Herança feérica: vantagem contra encantamentos e imunidade a sono mágico.\n\n"
+        "Versatilidade de talentos: proficiência em duas perícias extras.\n\n"
+        "Idiomas: comum, élfico e mais um idioma à sua escolha.",
+    "Elfo":
+        "Elfos são conhecidos por sua longevidade, visão aguçada e forte conexão com a magia. Valorizam a arte e a natureza, sendo rápidos e atentos em qualquer ambiente.\n\n"
+        "Graça élfica: +2 em Destreza.\n\n"
+        "Deslocamento: 9 metros por rodada.\n\n"
+        "Visão no escuro: enxergam até 18 metros na penumbra ou escuridão.\n\n"
+        "Tradição feérica: vantagem contra encantamentos e imunidade a efeitos mágicos de sono.\n\n"
+        "Sentidos aguçados: proficiência em Percepção.\n\n"
+        "Idiomas: comum e élfico.",
+    "Humano":
+      "Extremamente diversos, os humanos prosperam em todas as partes do mundo.Sua capacidade de adaptação os torna aventureiros ousados e criativos.\n\n"
+      "Atributos adaptáveis: humanos recebem +1 em todos os atributos, refletindo sua versatilidade.\n\n"
+      "Deslocamento: 9 metros por rodada.\n\n"
+      "Versatilidade: adaptáveis a qualquer situação, os humanos podem se destacar em diferentes funções.\n\n"
+      "Idiomas: sabem falar comum e um idioma adicional à escolha.",
+    "Halfling":
+        "Pequenos e ágeis, os halflings têm um espírito otimista e acolhedor. Preferem uma vida tranquila, mas quando aventureiros, destacam-se pela sorte e agilidade.\n\n"
+        "Pequenos e ágeis: +2 em Destreza.\n\n"
+        "Deslocamento: 7,5 metros por rodada.\n\n"
+        "Sortudos: ao rolar 1 em um teste de ataque, habilidade ou resistência, pode rolar novamente o dado.\n\n"
+        "Valentia: vantagem contra efeitos de medo.\n\n"
+        "Agilidade natural: podem se mover pelo espaço de criaturas maiores.\n\n"
+        "Idiomas: comum e halfling.",
+    "Meio-Orc":
+        "Nascidos da força orc e da resiliência humana, os meio-orcs carregam uma presença intimidadora. Muitos são guerreiros ferozes, mas também leais companheiros.\n\n"
+        "Força brutal: +2 em Força e +1 em Constituição.\n\n"
+        "Deslocamento: 9 metros por rodada.\n\n"
+        "Visão no escuro: até 18 metros.\n\n"
+        "Resistência incansável: quando reduzido a 0 PV, pode permanecer em 1 PV uma vez por descanso longo.\n\n"
+        "Ataques selvagens: ao conseguir um acerto crítico com arma corpo a corpo, rola um dado adicional de dano.\n\n"
+        "Idiomas: comum e orc.",
+    "Anão":
+        "De estatura baixa e coração firme, os anões são famosos por sua habilidade em forjar armas e armaduras. Sua disciplina e honra os tornam aliados leais\n\n"
+        "Força da montanha: +2 em Constituição.\n\n"
+        "Deslocamento: 7,5 metros por rodada (mas não é reduzido por armadura pesada).\n\n"
+        "Visão no escuro: até 18 metros.\n\n"
+        "Resistência anã: vantagem contra veneno e resistência a dano de veneno.\n\n"
+        "Tradição das ferramentas: proficiência em uma ferramenta de artesão à escolha.\n\n"
+        "Idiomas: comum e anão.",
+    "Draconato":
+        "Descendentes de dragões, os draconatos têm sangue poderoso em suas veias. Exalam força e orgulho, e muitos carregam consigo a habilidade de soltar um sopro elemental.\n\n"
+        "Força dracônica: +2 em Força e +1 em Carisma.\n\n"
+        "Deslocamento: 9 metros por rodada.\n\n"
+        "Ancestralidade dracônica: cada draconato possui um tipo de dragão ancestral (fogo, gelo, ácido, etc.), que define seu sopro e resistência.\n\n"
+        "Arma de sopro: podem exalar energia elemental (dano e área variam conforme o ancestral).\n\n"
+        "Resistência dracônica: resistência ao tipo de dano do ancestral.\n\n"
+        "Idiomas: comum e dracônico.",
+    "Tiefling":
+        "Marcados por uma herança infernal, os tieflings enfrentam preconceito, mas possuem determinação e carisma únicos. Muitos se voltam para a magia e para seu destino misterioso.\n\n"
+        "Herança infernal: +2 em Carisma e +1 em Inteligência.\n\n"
+        "Deslocamento: 9 metros por rodada.\n\n"
+        "Visão no escuro: até 18 metros.\n\n"
+        "Resistência infernal: resistência a dano de fogo.\n\n"
+        "Magia inata: aprendem pequenos truques mágicos, que evoluem com o nível.\n\n"
+        "Idiomas: comum e infernal.",
+    "Gnomo":
+        "Pequenos em tamanho, mas grandes em curiosidade. Os gnomos adoram invenções, truques e mistérios. São brincalhões, mas também sábios e engenhosos.\n\n"
+        "Inteligência aguçada: +2 em Inteligência e +1 em Destreza ou Constituição, à escolha.\n\n"
+        "Deslocamento: 7,5 metros por rodada.\n\n"
+        "Visão no escuro: até 18 metros.\n\n"
+        "Truques gnomescos: aprendem pequenos truques mágicos naturais, que evoluem com o nível.\n\n"
+        "Resistência gnomesca: vantagem contra magia que visa enganar ou enfeitiçar.\n\n"
+        "Idiomas: comum e gnômico.",
+  };
+
   @override
   Widget build(BuildContext context) {
     final Map<String, String> race =
         ModalRoute.of(context)!.settings.arguments as Map<String, String>;
+
+    final description = raceDescriptions[race["name"]] ?? "Descrição indisponível.";
 
     return Scaffold(
       body: Container(
@@ -25,7 +101,8 @@ class RaceDetailScreen extends StatelessWidget {
             children: [
               // ===== Botões no topo =====
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -38,8 +115,6 @@ class RaceDetailScreen extends StatelessWidget {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
-
-
                       ),
                       onPressed: () => Navigator.pop(context),
                       child: const Text("Voltar"),
@@ -55,7 +130,7 @@ class RaceDetailScreen extends StatelessWidget {
                         ),
                       ),
                       onPressed: () {
-                       // Salva a raça no ValueNotifier
+                        // Salva a raça no ValueNotifier
                         SelectionManager.selectedRace.value = race["name"];
                         Navigator.pop(context); // volta depois de selecionar
                       },
@@ -95,19 +170,7 @@ class RaceDetailScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      """
-Aumento na pontuação de habilidade: Meio-elfos recebem um bônus de +2 em Carisma e +1 em duas outras habilidades à sua escolha.
-
-Velocidade: 9 metros.
-
-Visão no escuro: até 18 metros.
-
-Ancestralidade Féerica: vantagem contra encantamentos e imunidade a sono mágico.
-
-Versatilidade de Habilidades: proficiência em duas habilidades à sua escolha.
-
-Idiomas: Comum, Élfico e mais um idioma adicional.
-                      """,
+                      description,
                       style: GoogleFonts.imFellEnglish(
                         color: Colors.white,
                         fontSize: 16,

@@ -9,6 +9,9 @@ import 'package:device_preview/device_preview.dart';
 import 'package:app_rpg/screens/recuperar/recuperar_senha_screen.dart';
 import 'screens/character/race_detail_screen.dart';
 import 'screens/character/class_screen.dart';
+import 'screens/character/background_screen.dart';
+import 'screens/character/background_detail_screen.dart';
+
 // ignore: unused_import
 import 'package:get_it/get_it.dart';
 
@@ -40,6 +43,8 @@ class MyApp extends StatelessWidget {
         AppRoutes.recuperarSenha: (_) => const RecuperarSenhaScreen(), 
         AppRoutes.raceDetail: (_) => const RaceDetailScreen(),
         AppRoutes.classScreen: (_) => const ClassScreen(),
+        AppRoutes.backgroundScreen: (_) => const BackgroundScreen(),
+        AppRoutes.backgroundDetailScreen: (_) => const BackgroundDetailScreen(),
       },
     );
   }

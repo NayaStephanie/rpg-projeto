@@ -178,34 +178,78 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
-  // Função para validar cadastro
-  void _validarCadastro(BuildContext context) {
-    String nome = nomeController.text.trim();
-    String email = emailController.text.trim();
-    String telefone = telefoneController.text.trim();
-    String senha = senhaController.text.trim();
-    String confirmarSenha = confirmarSenhaController.text.trim();
+  // Função para exibir SnackBar customizado
+void _mostrarSnackBar(BuildContext context, String mensagem,
+    {IconData? icone, Color cor = Colors.red}) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Row(
+        children: [
+          Icon(icone ?? Icons.error_outline, color: Colors.white),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              mensagem,
+              style: GoogleFonts.imFellEnglish(
+                fontSize: 20,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
+      ),
+      backgroundColor: cor.withOpacity(0.85),
+      behavior: SnackBarBehavior.floating,
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+      ),
+      duration: const Duration(seconds: 3),
+    ),
+  );
+}
 
-    if (nome.isEmpty || email.isEmpty || telefone.isEmpty || senha.isEmpty || confirmarSenha.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Por favor, preencha todos os campos.")),
-      );
-      return;
-    }
+// Função para validar cadastro
+void _validarCadastro(BuildContext context) {
+  String nome = nomeController.text.trim();
+  String email = emailController.text.trim();
+  String telefone = telefoneController.text.trim();
+  String senha = senhaController.text.trim();
+  String confirmarSenha = confirmarSenhaController.text.trim();
 
-    if (senha != confirmarSenha) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("As senhas não coincidem.")),
-      );
-      return;
-    }
-
-    // Se passou na validação
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Cadastro realizado com sucesso!")),
+  if (nome.isEmpty ||
+      email.isEmpty ||
+      telefone.isEmpty ||
+      senha.isEmpty ||
+      confirmarSenha.isEmpty) {
+    _mostrarSnackBar(
+      context,
+      "Por favor, preencha todos os campos.",
+      icone: Icons.warning_amber_rounded,
+      cor: Colors.orange,
     );
-
-    // Depois pode salvar em banco de dados/local/nuvem
-    Navigator.pop(context);
+    return;
   }
+
+  if (senha != confirmarSenha) {
+    _mostrarSnackBar(
+      context,
+      "As senhas não coincidem.",
+      icone: Icons.lock_outline,
+      cor: Colors.red,
+    );
+    return;
+  }
+
+  // Se passou na validação
+  _mostrarSnackBar(
+    context,
+    "Cadastro realizado com sucesso!",
+    icone: Icons.check_circle_outline,
+    cor: Colors.green,
+  );
+
+  // Depois pode salvar em banco de dados/local/nuvem
+  Navigator.pop(context);
+}
 }

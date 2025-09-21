@@ -7,16 +7,107 @@ import 'package:app_rpg/selection_manager.dart';
 class ClassDetailScreen extends StatelessWidget {
   const ClassDetailScreen({super.key});
 
+  // Descrições originais das classes
+  static final Map<String, String> classDescriptions = {
+    "Monge":
+        "Mestres da disciplina física e espiritual, os monges combinam agilidade e poder interno.\n\n"
+        "Disciplina monástica: +2 em Destreza ou +1 em Sabedoria.\n\n"
+        "Deslocamento: 9 metros por rodada.\n\n"
+        "Artes marciais: podem realizar ataques rápidos e precisos sem armas.\n\n"
+        "Ki: energia interna que permite movimentos especiais e defesas.\n\n"
+        "Idiomas: comum.",
+    "Mago":
+        "Estudiosos arcanos, os magos dominam magias poderosas, mas frágeis fisicamente.\n\n"
+        "Inteligência arcana: +2 em Inteligência ou +1 em Destreza.\n\n"
+        "Deslocamento: 9 metros por rodada.\n\n"
+        "Magia estudada: podem aprender e preparar magias de acordo com seu nível.\n\n"
+        "Versatilidade mágica: acesso a ritualizações e magias de diversas escolas.\n\n"
+        "Idiomas: comum e um idioma adicional à escolha.",
+    "Clérigo":
+        "Servos de divindades, os clérigos equilibram combate e magia divina.\n\n"
+        "Sabedoria divina: +2 em Sabedoria ou +1 em Constituição.\n\n"
+        "Deslocamento: 9 metros por rodada.\n\n"
+        "Domínio divino: habilidade de escolher um domínio que oferece magias e poderes especiais.\n\n"
+        "Canalização de energia: podem curar aliados ou repelir inimigos.\n\n"
+        "Idiomas: comum e celestial.",
+    "Bruxo":
+        "Pactos sombrios concedem aos bruxos poder arcano em troca de devoção ou vínculo.\n\n"
+        "Carisma místico: +2 em Carisma ou +1 em Destreza.\n\n"
+        "Deslocamento: 9 metros por rodada.\n\n"
+        "Magia inata: lançam feitiços com base no pacto escolhido.\n\n"
+        "Invocações: habilidades especiais únicas que aumentam suas magias ou ataques.\n\n"
+        "Idiomas: comum e infernal ou um idioma adicional.",
+    "Bardo":
+        "Artistas e encantadores, os bardos usam música e magia para inspirar e influenciar.\n\n"
+        "Carisma inspirador: +2 em Carisma ou +1 em Destreza.\n\n"
+        "Deslocamento: 9 metros por rodada.\n\n"
+        "Magia musical: podem lançar feitiços de suporte ou ilusão.\n\n"
+        "Versatilidade: proficiência em diversas perícias e instrumentos.\n\n"
+        "Idiomas: comum e um idioma adicional à escolha.",
+    "Bárbaro":
+        "Guerrilheiros ferozes, os bárbaros confiam em força bruta e resistência em combate.\n\n"
+        "Força brutal: +2 em Força ou +1 em Constituição.\n\n"
+        "Deslocamento: 9 metros por rodada.\n\n"
+        "Fúria: aumenta dano e resistência temporariamente.\n\n"
+        "Resistência física: vantagem em testes de resistência contra efeitos que causam dano.\n\n"
+        "Idiomas: comum e orc ou um idioma adicional.",
+    "Ladino":
+        "Astutos e ágeis, os ladinos são especialistas em furtividade, truques e ataques precisos.\n\n"
+        "Destreza ágil: +2 em Destreza ou +1 em Inteligência.\n\n"
+        "Deslocamento: 9 metros por rodada.\n\n"
+        "Ataque furtivo: dano extra ao atacar inimigos desprevenidos.\n\n"
+        "Versatilidade: proficiência em perícias de agilidade e enganação.\n\n"
+        "Idiomas: comum e um idioma adicional à escolha.",
+    "Guerreiro":
+        "Defensores e combatentes versáteis, os guerreiros se destacam no uso de armas e armaduras.\n\n"
+        "Força marcial: +2 em Força ou +1 em Constituição.\n\n"
+        "Deslocamento: 9 metros por rodada.\n\n"
+        "Especialização em combate: podem escolher um estilo de luta que aprimora suas habilidades.\n\n"
+        "Resistência: aptidão para armaduras pesadas e diversas armas.\n\n"
+        "Idiomas: comum.",
+    "Feiticeiro":
+        "A magia dos feiticeiros nasce de um talento inato ou linhagem especial.\n\n"
+        "Carisma arcano: +2 em Carisma ou +1 em Constituição.\n\n"
+        "Deslocamento: 9 metros por rodada.\n\n"
+        "Magia inata: lançam feitiços com foco em sua origem mágica.\n\n"
+        "Metamagia: podem modificar magias para efeitos especiais.\n\n"
+        "Idiomas: comum e um idioma adicional à escolha.",
+    "Druida":
+        "Protetores da natureza, os druidas utilizam magia e formas animais para manter o equilíbrio.\n\n"
+        "Sabedoria natural: +2 em Sabedoria ou +1 em Constituição.\n\n"
+        "Deslocamento: 9 metros por rodada.\n\n"
+        "Magia natural: podem lançar feitiços baseados em elementos e cura.\n\n"
+        "Transformação: habilidade de assumir formas animais.\n\n"
+        "Idiomas: comum e dracônico ou silvestre.",
+    "Patrulheiro":
+        "Guardas do mundo selvagem, os patrulheiros combinam rastreamento, combate e magia.\n\n"
+        "Destreza e sobrevivência: +2 em Destreza ou +1 em Sabedoria.\n\n"
+        "Deslocamento: 9 metros por rodada.\n\n"
+        "Caçador experiente: proficiência em armas e habilidades de rastrear inimigos.\n\n"
+        "Companheiro animal: podem ter um aliado natural em combate.\n\n"
+        "Idiomas: comum e um idioma adicional à escolha.",
+    "Paladino":
+        "Guardiões sagrados, os paladinos unem força física e poderes divinos.\n\n"
+        "Força e Carisma: +2 em Força ou +1 em Carisma.\n\n"
+        "Deslocamento: 9 metros por rodada.\n\n"
+        "Juramento sagrado: poderes concedidos por sua fé e devoção.\n\n"
+        "Cura e proteção: podem curar aliados e proteger os justos.\n\n"
+        "Idiomas: comum e celestial.",
+  };
+
   @override
   Widget build(BuildContext context) {
     final Map<String, String> classData =
         ModalRoute.of(context)!.settings.arguments as Map<String, String>;
 
+    final description =
+        classDescriptions[classData["name"]] ?? "Descrição indisponível.";
+
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
-            image: AssetImage("lib/assets/images/image_dracon_3.png"), // fundo
+            image: AssetImage("lib/assets/images/image_dracon_3.png"),
             fit: BoxFit.cover,
           ),
         ),
@@ -25,7 +116,8 @@ class ClassDetailScreen extends StatelessWidget {
             children: [
               // ===== Botões no topo =====
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -38,8 +130,6 @@ class ClassDetailScreen extends StatelessWidget {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
-
-
                       ),
                       onPressed: () => Navigator.pop(context),
                       child: const Text("Voltar"),
@@ -55,9 +145,9 @@ class ClassDetailScreen extends StatelessWidget {
                         ),
                       ),
                       onPressed: () {
-                       // Salva a classe no ValueNotifier
-                        SelectionManager.selectedClass.value = classData["name"];
-                        Navigator.pop(context); // volta depois de selecionar
+                        SelectionManager.selectedClass.value =
+                            classData["name"];
+                        Navigator.pop(context);
                       },
                       child: const Text("Selecionar"),
                     ),
@@ -95,19 +185,7 @@ class ClassDetailScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      """
-Aumento na pontuação de habilidade: Meio-elfos recebem um bônus de +2 em Carisma e +1 em duas outras habilidades à sua escolha.
-
-Velocidade: 9 metros.
-
-Visão no escuro: até 18 metros.
-
-Ancestralidade Féerica: vantagem contra encantamentos e imunidade a sono mágico.
-
-Versatilidade de Habilidades: proficiência em duas habilidades à sua escolha.
-
-Idiomas: Comum, Élfico e mais um idioma adicional.
-                      """,
+                      description,
                       style: GoogleFonts.imFellEnglish(
                         color: Colors.white,
                         fontSize: 16,

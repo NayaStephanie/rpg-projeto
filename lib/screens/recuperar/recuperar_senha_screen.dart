@@ -25,13 +25,51 @@ class _RecuperarSenhaScreenState extends State<RecuperarSenhaScreen> {
     return null;
   }
 
+  // Função para exibir SnackBar estilizado
+  void _mostrarSnackBar(BuildContext context, String mensagem,
+      {IconData? icone, Color cor = Colors.red}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(icone ?? Icons.info_outline, color: Colors.white),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                mensagem,
+                style: GoogleFonts.imFellEnglish(
+                  fontSize: 20,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: cor.withOpacity(0.85),
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+        ),
+        duration: const Duration(seconds: 3),
+      ),
+    );
+  }
+
   void _enviar() {
     if (_formKey.currentState!.validate()) {
-      // Aqui no futuro pode enviar requisição ao backend
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Um link de recuperação foi enviado para ${emailController.text}"),
-        ),
+      _mostrarSnackBar(
+        context,
+        "Um link de recuperação foi enviado para ${emailController.text}",
+        icone: Icons.email_outlined,
+        cor: Colors.green,
+      );
+    } else {
+      _mostrarSnackBar(
+        context,
+        "Digite um email válido",
+        icone: Icons.warning_amber_rounded,
+        cor: Colors.orange,
       );
     }
   }

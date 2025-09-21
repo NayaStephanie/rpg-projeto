@@ -2,23 +2,22 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:app_rpg/screens/character/class_detail_screen.dart';
+import 'package:app_rpg/screens/character/background_detail_screen.dart';
 import 'package:app_rpg/selection_manager.dart';
-import 'package:app_rpg/utils/app_routes.dart';
 
 // Constantes para padronizar
 const double titleFontSize = 80.0;
 const double itemFontSize = 28.0;
 const double buttonFontSize = 40.0;
 
-class ClassScreen extends StatefulWidget {
-  const ClassScreen({super.key});
+class BackgroundScreen extends StatefulWidget {
+  const BackgroundScreen({super.key});
 
   @override
-  State<ClassScreen> createState() => _ClassScreenState();
+  State<BackgroundScreen> createState() => _BackgroundScreenState();
 }
 
-class _ClassScreenState extends State<ClassScreen> {
+class _BackgroundScreenState extends State<BackgroundScreen> {
   // Função para exibir SnackBar customizado
   void _mostrarSnackBar(BuildContext context, String mensagem,
       {IconData? icone, Color cor = Colors.red}) {
@@ -52,19 +51,20 @@ class _ClassScreenState extends State<ClassScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final classes = [
-      {"name": "Bárbaro", "img": "lib/assets/images/classes/barbaro.png"},
-      {"name": "Bardo", "img": "lib/assets/images/classes/bardo.png"},
-      {"name": "Bruxo", "img": "lib/assets/images/classes/bruxo.png"},
-      {"name": "Clérigo", "img": "lib/assets/images/classes/clerigo.png"},
-      {"name": "Druida", "img": "lib/assets/images/classes/druida.png"},
-      {"name": "Feiticeiro", "img": "lib/assets/images/classes/feiticeiro.png"},
-      {"name": "Guerreiro", "img": "lib/assets/images/classes/guerreiro.png"},
-      {"name": "Ladino", "img": "lib/assets/images/classes/ladino.png"},
-      {"name": "Mago", "img": "lib/assets/images/classes/mago.png"},
-      {"name": "Monge", "img": "lib/assets/images/classes/monge.png"},
-      {"name": "Paladino", "img": "lib/assets/images/classes/paladino.png"},
-      {"name": "Patrulheiro", "img": "lib/assets/images/classes/patrulheiro.png"},
+    final backgrounds = [
+      {"name": "Artista", "img": "lib/assets/images/antecedentes/artista.png"},
+      {"name": "Artesão da Guilda", "img": "lib/assets/images/antecedentes/artesao_guilda.png"},
+      {"name": "Acólito", "img": "lib/assets/images/antecedentes/acolito.png"},
+      {"name": "Eremita", "img": "lib/assets/images/antecedentes/eremita.png"},
+      {"name": "Criminoso", "img": "lib/assets/images/antecedentes/criminoso.png"},
+      {"name": "Charlatão", "img": "lib/assets/images/antecedentes/charlatao.png"},
+      {"name": "Marinheiro", "img": "lib/assets/images/antecedentes/marinheiro.png"},
+      {"name": "Herói do Povo", "img": "lib/assets/images/antecedentes/heroi_povo.png"},
+      {"name": "Forasteiro", "img": "lib/assets/images/antecedentes/forasteiro.png"},
+      {"name": "Sábio", "img": "lib/assets/images/antecedentes/sabio.png"},
+      {"name": "Órfão", "img": "lib/assets/images/antecedentes/orfao.png"},
+      {"name": "Nobre", "img": "lib/assets/images/antecedentes/nobre.png"},
+      {"name": "Soldado", "img": "lib/assets/images/antecedentes/soldado.png"},
     ];
 
     return Scaffold(
@@ -74,7 +74,7 @@ class _ClassScreenState extends State<ClassScreen> {
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
-                image: AssetImage("lib/assets/images/image_dracon_3.png"),
+                image: AssetImage("lib/assets/images/image_dracon_4.png"),
                 fit: BoxFit.cover,
                 alignment: Alignment.centerLeft,
               ),
@@ -91,7 +91,7 @@ class _ClassScreenState extends State<ClassScreen> {
 
               // Título
               Text(
-                "Classe",
+                "Antecedente",
                 style: GoogleFonts.jimNightshade(
                   fontSize: titleFontSize,
                   color: Colors.white,
@@ -100,7 +100,7 @@ class _ClassScreenState extends State<ClassScreen> {
 
               const SizedBox(height: 20),
 
-              // Grid de Classes
+              // Grid de Antecedentes
               Expanded(
                 child: Container(
                   margin: const EdgeInsets.symmetric(horizontal: 20),
@@ -114,12 +114,12 @@ class _ClassScreenState extends State<ClassScreen> {
                         const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 3, // Número de colunas
                       crossAxisSpacing: 10, // Espaçamento horizontal
-                      mainAxisSpacing: 2,
-                      childAspectRatio: 0.7,
+                      mainAxisSpacing: 1, // Espaçamento vertical
+                      childAspectRatio: 0.5,
                     ),
-                    itemCount: classes.length,
+                    itemCount: backgrounds.length,
                     itemBuilder: (context, index) {
-                      final classe = classes[index];
+                      final bg = backgrounds[index];
 
                       return GestureDetector(
                         onTap: () {
@@ -128,8 +128,8 @@ class _ClassScreenState extends State<ClassScreen> {
                             PageRouteBuilder(
                               transitionDuration: const Duration(milliseconds: 600),
                               pageBuilder: (context, animation, secondaryAnimation) =>
-                                  const ClassDetailScreen(),
-                              settings: RouteSettings(arguments: classe),
+                                  const BackgroundDetailScreen(),
+                              settings: RouteSettings(arguments: bg),
                               transitionsBuilder:
                                   (context, animation, secondaryAnimation, child) {
                                 final tween = Tween(begin: const Offset(0, -1), end: Offset.zero);
@@ -144,8 +144,7 @@ class _ClassScreenState extends State<ClassScreen> {
                               },
                             ),
                           ).then((_) {
-                            // Atualiza a tela quando voltar da tela de detalhes
-                            setState(() {});
+                            setState(() {}); // Atualiza quando voltar
                           });
                         },
                         child: Column(
@@ -153,8 +152,8 @@ class _ClassScreenState extends State<ClassScreen> {
                             Container(
                               decoration: BoxDecoration(
                                 border: Border.all(
-                                  color: SelectionManager.selectedClass.value ==
-                                          classe["name"]
+                                  color: SelectionManager.selectedBackground.value ==
+                                          bg["name"]
                                       ? Colors.yellow
                                       : Colors.transparent,
                                   width: 3,
@@ -162,13 +161,13 @@ class _ClassScreenState extends State<ClassScreen> {
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Image.asset(
-                                classe["img"]!,
-                                height: 90,
+                                bg["img"]!,
+                                height: 100,
                               ),
                             ),
                             const SizedBox(height: 5),
                             Text(
-                              classe["name"]!,
+                              bg["name"]!,
                               style: GoogleFonts.jimNightshade(
                                 fontSize: itemFontSize,
                                 color: Colors.white,
@@ -197,16 +196,15 @@ class _ClassScreenState extends State<ClassScreen> {
                     ),
                   ),
                   onPressed: () {
-                    if (SelectionManager.selectedClass.value == null) {
+                    if (SelectionManager.selectedBackground.value == null) {
                       _mostrarSnackBar(
                         context,
-                        "Por favor, selecione uma classe antes de prosseguir.",
+                        "Por favor, selecione um antecedente antes de prosseguir.",
                         icone: Icons.warning_amber_rounded,
                         cor: Colors.orange,
                       );
                     } else {
                       // Próxima tela do fluxo
-                      Navigator.pushNamed(context, AppRoutes.backgroundScreen);
                     }
                   },
                   child: Text(

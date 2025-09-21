@@ -8,4 +8,6 @@ class AppRoutes {
   static const recuperarSenha = '/recuperarSenha';
   static const raceDetail = '/raceDetail';
   static const classScreen = '/classScreen';
+  static const backgroundScreen = '/backgroundScreen';
+  static const backgroundDetailScreen = '/backgroundDetailScreen';
 }
