@@ -1,9 +1,11 @@
 // ignore_for_file: deprecated_member_use
 
+import 'package:app_rpg/screens/character/attributes_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:app_rpg/screens/character/background_detail_screen.dart';
 import 'package:app_rpg/selection_manager.dart';
+
 
 // Constantes para padronizar
 const double titleFontSize = 80.0;
@@ -205,6 +207,12 @@ class _BackgroundScreenState extends State<BackgroundScreen> {
                       );
                     } else {
                       // Próxima tela do fluxo
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AttributesScreen(),
+                        ),
+                      );
                     }
                   },
                   child: Text(

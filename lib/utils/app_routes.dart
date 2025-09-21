@@ -10,4 +10,6 @@ class AppRoutes {
   static const classScreen = '/classScreen';
   static const backgroundScreen = '/backgroundScreen';
   static const backgroundDetailScreen = '/backgroundDetailScreen';
+  static const summaryScreen = '/summaryScreen';
+  static const attributeScreen = '/attributeScreen';
 }

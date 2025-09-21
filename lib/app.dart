@@ -10,6 +10,8 @@ import 'screens/about/about_screen.dart';
 import 'screens/recuperar/recuperar_senha_screen.dart';
 import 'screens/character/background_screen.dart';
 import 'screens/character/background_detail_screen.dart';
+import 'screens/ficha/summary_screen.dart';
+import 'screens/character/attributes_screen.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -33,6 +35,8 @@ class MyApp extends StatelessWidget {
         AppRoutes.recuperarSenha: (_) => const RecuperarSenhaScreen(),
         AppRoutes.backgroundScreen: (_) => const BackgroundScreen(),
         AppRoutes.backgroundDetailScreen: (_) => const BackgroundDetailScreen(),
+        AppRoutes.summaryScreen: (_) => const SummaryScreen(),
+        AppRoutes.attributeScreen: (_) => const AttributesScreen(),
       },
     );
   }

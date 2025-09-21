@@ -52,15 +52,15 @@ class _RaceScreenState extends State<RaceScreen> {
   @override
   Widget build(BuildContext context) {
     final races = [
-      {"name": "Meio-Elfo", "img": "lib/assets/images/racas/raca_meio_elfo.png"},
-      {"name": "Elfo", "img": "lib/assets/images/racas/raca_elfo.png"},
-      {"name": "Humano", "img": "lib/assets/images/racas/raca_humano.png"},
-      {"name": "Halfling", "img": "lib/assets/images/racas/raca_halfling.png"},
-      {"name": "Meio-Orc", "img": "lib/assets/images/racas/raca_meio_orc.png"},
-      {"name": "Anão", "img": "lib/assets/images/racas/raca_anao.png"},
-      {"name": "Draconato", "img": "lib/assets/images/racas/raca_draconato.png"},
-      {"name": "Tiefling", "img": "lib/assets/images/racas/raca_tiefling.png"},
-      {"name": "Gnomo", "img": "lib/assets/images/racas/raca_gnomo.png"},
+      {"name": "Meio-Elfo", "img": "lib/assets/images/racas/meio_elfo.png"},
+      {"name": "Elfo", "img": "lib/assets/images/racas/elfo.png"},
+      {"name": "Humano", "img": "lib/assets/images/racas/humano.png"},
+      {"name": "Halfling", "img": "lib/assets/images/racas/halfling.png"},
+      {"name": "Meio-Orc", "img": "lib/assets/images/racas/meio_orc.png"},
+      {"name": "Anão", "img": "lib/assets/images/racas/anao.png"},
+      {"name": "Draconato", "img": "lib/assets/images/racas/draconato.png"},
+      {"name": "Tiefling", "img": "lib/assets/images/racas/tiefling.png"},
+      {"name": "Gnomo", "img": "lib/assets/images/racas/gnomo.png"},
     ];
 
     return Scaffold(

@@ -5,4 +5,5 @@ class SelectionManager {
   static ValueNotifier<String?> selectedRace = ValueNotifier(null);
   static ValueNotifier<String?> selectedClass = ValueNotifier(null);
   static ValueNotifier<String?> selectedBackground = ValueNotifier(null);
+  static ValueNotifier<Map<String, int>> selectedAttributes = ValueNotifier({});
 }
