@@ -31,6 +31,15 @@ class _AttributesScreenState extends State<AttributesScreen> {
   int pontosUsados = 0;
   final int maxPontos = 27;
 
+  @override
+  void initState() {
+    super.initState();
+    // Garante que o diálogo de bônus racial só apareça após a tela ser construída
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkForCustomRaceBonus(context);
+    });
+  }
+
   // Função para calcular modificador
   int calcularMod(int valor) {
     return ((valor - 10) / 2).floor();
@@ -39,8 +48,8 @@ class _AttributesScreenState extends State<AttributesScreen> {
   // Função de custo do Point Buy
   int custoAtributo(int valor) {
     if (valor <= 13) return valor - 8;
-    if (valor == 14) return 7; // até 13 custa 5, +2 = 7
-    if (valor == 15) return 9; // até 13 custa 5, +4 = 9
+    if (valor == 14) return 7;
+    if (valor == 15) return 9;
     return 0;
   }
 
@@ -156,6 +165,160 @@ class _AttributesScreenState extends State<AttributesScreen> {
     );
   }
 
+  // --- LÓGICA DE BÔNUS RACIAL ---
+
+  String? _normalizeAssetName(String? name) {
+    if (name == null) return null;
+    return name
+        .toLowerCase()
+        .replaceAll(RegExp(r'[áàãâä]'), 'a')
+        .replaceAll(RegExp(r'[éèêë]'), 'e')
+        .replaceAll(RegExp(r'[íìîï]'), 'i')
+        .replaceAll(RegExp(r'[óòõôö]'), 'o')
+        .replaceAll(RegExp(r'[úùûü]'), 'u')
+        .replaceAll(RegExp(r'[ç]'), 'c')
+        .replaceAll(RegExp(r'[^a-z0-9_]'), '');
+  }
+
+  void _checkForCustomRaceBonus(BuildContext context) {
+    final race = SelectionManager.selectedRace.value;
+    if (race == null) {
+      SelectionManager.selectedCustomBonus.value = {};
+      return;
+    }
+
+    final normalizedRace = _normalizeAssetName(race)!;
+
+    if (normalizedRace == 'gnomo') {
+      _showGnomeBonusDialog(context);
+    } else if (normalizedRace == 'meioelfo') {
+      _showHalfElfBonusDialog(context);
+    } else {
+      // Limpa bônus customizados para raças sem escolha (importante!)
+      SelectionManager.selectedCustomBonus.value = {};
+    }
+  }
+
+  // Diálogo para Gnomo (+1 DES ou CON)
+  void _showGnomeBonusDialog(BuildContext context) {
+    String? selectedAttribute;
+    
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setStateSB) {
+            return AlertDialog(
+              title: Text("Bônus Racial de Gnomo", style: GoogleFonts.jimNightshade(fontSize: 28)),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Seu personagem Gnomo recebe +2 em INT e mais +1 em uma habilidade à sua escolha (Destreza ou Constituição). Selecione onde aplicar o +1:",
+                    style: GoogleFonts.imFellEnglish(fontSize: 20)),
+                  RadioListTile<String>(
+                    title: const Text('Destreza (DES)'),
+                    value: 'DES',
+                    groupValue: selectedAttribute,
+                    onChanged: (value) => setStateSB(() => selectedAttribute = value),
+                  ),
+                  RadioListTile<String>(
+                    title: const Text('Constituição (CON)'),
+                    value: 'CON',
+                    groupValue: selectedAttribute,
+                    onChanged: (value) => setStateSB(() => selectedAttribute = value),
+                  ),
+                ],
+              ),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: selectedAttribute == null
+                      ? null
+                      : () {
+                          SelectionManager.selectedCustomBonus.value = {selectedAttribute!: 1};
+                          Navigator.of(dialogContext).pop();
+                          _mostrarSnackBar(context, "Bônus de Gnomo (+1 $selectedAttribute) aplicado!", icone: Icons.check_circle, cor: Colors.green);
+                        },
+                  child: const Text('Confirmar'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  // Diálogo para Meio-Elfo (+1 em Duas Habilidades)
+  void _showHalfElfBonusDialog(BuildContext context) {
+    Map<String, int> tempBonus = {};
+    
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setStateSB) {
+            // Meio-Elfo não pode escolher Carisma (CAR)
+            final availableAttributes = atributos.keys.where((attr) => attr != 'CAR').toList();
+            final selectedCount = tempBonus.keys.length;
+
+            return AlertDialog(
+              title: Text("Bônus Racial de Meio-Elfo", style: GoogleFonts.jimNightshade(fontSize: 28)),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Seu personagem Meio-Elfo recebe +2 em CAR e mais +1 em duas outras habilidades à sua escolha. Selecione as duas habilidades:",
+                    style: GoogleFonts.imFellEnglish(fontSize: 20)),
+                  ...availableAttributes.map((attr) {
+                    final isSelected = tempBonus.containsKey(attr);
+                    
+                    return CheckboxListTile(
+                      title: Text(attr),
+                      value: isSelected,
+                      onChanged: (bool? value) {
+                        setStateSB(() {
+                          if (value == true) {
+                            if (selectedCount < 2) {
+                              tempBonus[attr] = 1;
+                            }
+                          } else {
+                            tempBonus.remove(attr);
+                          }
+                        });
+                      },
+                      controlAffinity: ListTileControlAffinity.leading,
+                      // Desabilita caixas de seleção se já tiver 2 e não for a atual
+                      enabled: isSelected || selectedCount < 2,
+                    );
+                  }),
+                  Text("Selecionado: $selectedCount/2", style: GoogleFonts.imFellEnglish(fontSize: 18, fontWeight: FontWeight.bold)),
+                ],
+              ),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: selectedCount != 2
+                      ? null
+                      : () {
+                          SelectionManager.selectedCustomBonus.value = tempBonus;
+                          Navigator.of(dialogContext).pop();
+                          final bonusList = tempBonus.keys.join(' e ');
+                          _mostrarSnackBar(context, "Bônus de Meio-Elfo (+1 em $bonusList) aplicado!", icone: Icons.check_circle, cor: Colors.green);
+                        },
+                  child: const Text('Confirmar'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+  
+  // --- FIM LÓGICA DE BÔNUS RACIAL ---
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -262,7 +425,7 @@ class _AttributesScreenState extends State<AttributesScreen> {
                       Text(
                         "Pontos $pontosUsados/$maxPontos",
                         style: GoogleFonts.imFellEnglish(
-                            fontSize: 22, color: Colors.white),
+                            fontSize: 22, color: pontosUsados > maxPontos ? Colors.red : Colors.white),
                       ),
                     ],
                   ),
@@ -305,6 +468,8 @@ class _AttributesScreenState extends State<AttributesScreen> {
                             icone: Icons.warning_amber_rounded, cor: Colors.orange);
                       } else {
                         SelectionManager.selectedAttributes.value = atributos;
+                        // Verifica se os bônus customizados foram escolhidos antes de avançar, se necessário.
+                        // Para o Gnomo e Meio-Elfo, o diálogo garante que a escolha foi feita antes de fechar.
                         Navigator.push(
                           context,
                           MaterialPageRoute(
