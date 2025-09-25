@@ -12,9 +12,25 @@ const Map<String, Map<String, int>> raceBonuses = {
   'meioelfo': {
     'CAR': 2
   },
-  // Adicione outras raças aqui
-  // 'elfo': {'DES': 2},
-  // 'anao': {'CON': 2},
+  'meioorco': {
+    'FOR': 2, 'CON': 1
+  },
+  'halfling': {
+    'DES': 2
+  },
+  'draconato': {
+    'FOR': 2, 'CAR': 1
+  },
+  'tiefling': {
+    'INT': 1, 'CAR': 2
+  },
+  'anao': {
+    'CON': 2
+  },
+  'elfo': {
+    'DES': 2
+  },
+  
 };
 
 String _normalizeName(String name) {

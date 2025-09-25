@@ -55,13 +55,13 @@ class _BackgroundScreenState extends State<BackgroundScreen> {
   Widget build(BuildContext context) {
     final backgrounds = [
       {"name": "Artista", "img": "lib/assets/images/antecedentes/artista.png"},
-      {"name": "Artesão da Guilda", "img": "lib/assets/images/antecedentes/artesao_guilda.png"},
+      {"name": "Artesão da Guilda", "img": "lib/assets/images/antecedentes/artesao_da_guilda.png"},
       {"name": "Acólito", "img": "lib/assets/images/antecedentes/acolito.png"},
       {"name": "Eremita", "img": "lib/assets/images/antecedentes/eremita.png"},
       {"name": "Criminoso", "img": "lib/assets/images/antecedentes/criminoso.png"},
       {"name": "Charlatão", "img": "lib/assets/images/antecedentes/charlatao.png"},
       {"name": "Marinheiro", "img": "lib/assets/images/antecedentes/marinheiro.png"},
-      {"name": "Herói do Povo", "img": "lib/assets/images/antecedentes/heroi_povo.png"},
+      {"name": "Herói do Povo", "img": "lib/assets/images/antecedentes/heroi_do_povo.png"},
       {"name": "Forasteiro", "img": "lib/assets/images/antecedentes/forasteiro.png"},
       {"name": "Sábio", "img": "lib/assets/images/antecedentes/sabio.png"},
       {"name": "Órfão", "img": "lib/assets/images/antecedentes/orfao.png"},

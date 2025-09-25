@@ -1,3 +1,5 @@
+
+
 /// Centraliza os nomes das rotas para evitar erro de digitação
 class AppRoutes {
   static const login = '/login';
@@ -12,4 +14,5 @@ class AppRoutes {
   static const backgroundDetailScreen = '/backgroundDetailScreen';
   static const summaryScreen = '/summaryScreen';
   static const attributeScreen = '/attributeScreen';
+  static const characterSheet = '/characterSheet'; // Nova rota para a ficha final
 }

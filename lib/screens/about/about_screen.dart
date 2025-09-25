@@ -99,7 +99,6 @@ Que este artefato seja útil em suas campanhas, e que os dados sempre rolem a se
                           borderRadius: BorderRadius.circular(10),
                         ),
                         textStyle: GoogleFonts.cinzel(
-                          fontWeight: FontWeight.bold,
                           fontSize: 20,
                         ),
                       ),

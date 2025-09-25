@@ -42,11 +42,7 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 70),
-                _buildMenuButton(context, "Personagens", () {
-                  Navigator.push(context, MaterialPageRoute(
-                    builder: (context) => const RaceScreen(),
-                  ));
-                }),
+                _buildMenuButton(context, "Personagens", () {}),
                 const SizedBox(height: 50),
                 _buildMenuButton(context, "Criar", () {
                  Navigator.push(

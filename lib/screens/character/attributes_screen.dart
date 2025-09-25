@@ -194,8 +194,36 @@ class _AttributesScreenState extends State<AttributesScreen> {
     } else if (normalizedRace == 'meioelfo') {
       _showHalfElfBonusDialog(context);
     } else {
+      // Raças com bônus fixo
+     
+      String mensagem = "";
+
+      switch (normalizedRace) {
+        case 'humano':
+          mensagem = "Bônus de Humano (+1 em todos os atributos) aplicado!";
+          break;
+        case 'meioorco':
+          mensagem = "Bônus de Meio-Orc (+2 FOR, +1 CON) aplicado!";
+          break;
+        case 'halfling':
+          mensagem = "Bônus de Halfling (+2 DES) aplicado!";
+          break;
+        case 'draconato':
+          mensagem = "Bônus de Draconato (+2 FOR, +1 CAR) aplicado!";
+          break;
+        case 'tiefling':
+          mensagem = "Bônus de Tiefling (+1 INT, +2 CAR) aplicado!";
+          break;
+        case 'anao':
+          mensagem = "Bônus de Anão (+2 CON) aplicado!";
+          break;
+        case 'elfo':
+          mensagem = "Bônus de Elfo (+2 DES) aplicado!";
+          break;
+      }
       // Limpa bônus customizados para raças sem escolha (importante!)
       SelectionManager.selectedCustomBonus.value = {};
+      _mostrarSnackBar(context, mensagem, icone: Icons.check_circle, cor: Colors.green);
     }
   }
 

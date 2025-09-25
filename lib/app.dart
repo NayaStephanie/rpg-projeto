@@ -12,6 +12,7 @@ import 'screens/character/background_screen.dart';
 import 'screens/character/background_detail_screen.dart';
 import 'screens/ficha/summary_screen.dart';
 import 'screens/character/attributes_screen.dart';
+import 'screens/ficha_pronta/ficha_pronta.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -37,6 +38,7 @@ class MyApp extends StatelessWidget {
         AppRoutes.backgroundDetailScreen: (_) => const BackgroundDetailScreen(),
         AppRoutes.summaryScreen: (_) => const SummaryScreen(),
         AppRoutes.attributeScreen: (_) => const AttributesScreen(),
+        AppRoutes.characterSheet: (_) => const CharacterSheet(), // Nova rota para a ficha final
       },
     );
   }

@@ -13,7 +13,21 @@ const double buttonFontSize = 32.0;
   // Função para normalizar nomes para assets
   String? normalizeAssetName(String? name) {
 	if (name == null) return null;
-	return name.toLowerCase().replaceAll(' ', '_');
+	// Remove acentos e caracteres especiais para nomes de arquivos
+	String normalized = name.toLowerCase().replaceAll(' ', '_');
+	normalized = normalized
+		.replaceAll('á', 'a')
+		.replaceAll('ã', 'a')
+		.replaceAll('â', 'a')
+		.replaceAll('é', 'e')
+		.replaceAll('ê', 'e')
+		.replaceAll('í', 'i')
+		.replaceAll('ó', 'o')
+		.replaceAll('ô', 'o')
+		.replaceAll('õ', 'o')
+		.replaceAll('ú', 'u')
+		.replaceAll('ç', 'c');
+	return normalized;
   }
 
 class SummaryScreen extends StatelessWidget {
@@ -123,7 +137,7 @@ void _mostrarSnackBar(BuildContext context, String mensagem,
 		  Container(
 			decoration: const BoxDecoration(
 			  image: DecorationImage(
-				image: AssetImage("lib/assets/images/image_dracon_5.png"),
+				image: AssetImage("lib/assets/images/image_dracon_6.png"),
 				fit: BoxFit.cover,
 				alignment: Alignment.center,
 			  ),
@@ -260,9 +274,10 @@ void _mostrarSnackBar(BuildContext context, String mensagem,
 				borderRadius: BorderRadius.circular(10),
 			  ),
 			),
-			onPressed: () {
-			  _mostrarSnackBar(context, "Ficha finalizada!");
-			},
+      onPressed: () {
+    Navigator.pushNamed(context, '/characterSheet');
+        _mostrarSnackBar(context, "Ficha criada!");
+      },
 			child: Text(
 			  "Finalizar",
 			  style: GoogleFonts.imFellEnglish(
