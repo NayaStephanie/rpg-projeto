@@ -22,7 +22,7 @@ class ClassDetailScreen extends StatelessWidget {
     "Mago":
         "Estudiosos arcanos, os magos dominam magias poderosas, mas frágeis fisicamente.\n\n"
         "Magia estudada: podem aprender e preparar magias de acordo com seu nível.\n\n"
-        "Versatilidade mágica: acesso a ritualizações e magias de diversas escolas.\n\n"
+        "Versatilidade mágica: acesso a ritualizações e magias de diversas escolas.\n\n",
        
     "Clérigo":
         "Servos de divindades, os clérigos equilibram combate e magia divina.\n\n"
