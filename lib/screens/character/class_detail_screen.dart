@@ -9,20 +9,21 @@ class ClassDetailScreen extends StatelessWidget {
 
   // Descrições originais das classes
   static final Map<String, String> classDescriptions = {
+    
+    //Fazer campo de seleção para pericias e equipamentos de cada classe
     "Monge":
         "Mestres da disciplina física e espiritual, os monges combinam agilidade e poder interno.\n\n"
-        "Disciplina monástica: +2 em Destreza ou +1 em Sabedoria.\n\n"
-        "Deslocamento: 9 metros por rodada.\n\n"
-        "Artes marciais: podem realizar ataques rápidos e precisos sem armas.\n\n"
-        "Ki: energia interna que permite movimentos especiais e defesas.\n\n"
-        "Idiomas: comum.",
+        "Defesa sem armadura: Adicione seu modificador de Sabedoria e Destreza ao seu CA. (Não pode usar armadura) \n\n"
+        "Artes marciais: Usa Destreza ao invés de Força para ataques com armas de monge e ataques desarmados,\n"
+        "assim como usar sua ação bonus para dar um ataque desarmado após um ataque corpo a corpo"
+        "Proficiencias\nArmaduras: Nenhuma\nArmas: Armas Simples e Espada Curta\nTeste de Resistência: Força e Destreza\n",
+        //"Perícias: Escolha duas dentre Acrobacia, Atletismo, Furtividade, História, Intuição e Religião\n\n"
+        
     "Mago":
         "Estudiosos arcanos, os magos dominam magias poderosas, mas frágeis fisicamente.\n\n"
-        "Inteligência arcana: +2 em Inteligência ou +1 em Destreza.\n\n"
-        "Deslocamento: 9 metros por rodada.\n\n"
         "Magia estudada: podem aprender e preparar magias de acordo com seu nível.\n\n"
         "Versatilidade mágica: acesso a ritualizações e magias de diversas escolas.\n\n"
-        "Idiomas: comum e um idioma adicional à escolha.",
+       
     "Clérigo":
         "Servos de divindades, os clérigos equilibram combate e magia divina.\n\n"
         "Sabedoria divina: +2 em Sabedoria ou +1 em Constituição.\n\n"
