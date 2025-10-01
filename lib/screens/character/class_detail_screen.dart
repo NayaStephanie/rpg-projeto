@@ -15,7 +15,7 @@ class ClassDetailScreen extends StatelessWidget {
         "Mestres da disciplina física e espiritual, os monges combinam agilidade e poder interno.\n\n"
         "Defesa sem armadura: Adicione seu modificador de Sabedoria e Destreza ao seu CA. (Não pode usar armadura) \n\n"
         "Artes marciais: Usa Destreza ao invés de Força para ataques com armas de monge e ataques desarmados,\n"
-        "assim como usar sua ação bonus para dar um ataque desarmado após um ataque corpo a corpo"
+        "assim como usar sua ação bonus para dar um ataque desarmado após um ataque corpo a corpo\n"
         "Proficiencias\nArmaduras: Nenhuma\nArmas: Armas Simples e Espada Curta\nTeste de Resistência: Força e Destreza\n",
         //"Perícias: Escolha duas dentre Acrobacia, Atletismo, Furtividade, História, Intuição e Religião\n\n"
         
