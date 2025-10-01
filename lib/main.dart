@@ -14,7 +14,7 @@ import 'screens/character/background_screen.dart';
 import 'screens/character/background_detail_screen.dart';
 import 'screens/ficha/summary_screen.dart';
 import 'screens/character/attributes_screen.dart';
-
+//Teste
 // ignore: unused_import
 import 'package:get_it/get_it.dart';
 
