@@ -15,4 +15,5 @@ class AppRoutes {
   static const summaryScreen = '/summaryScreen';
   static const attributeScreen = '/attributeScreen';
   static const characterSheet = '/characterSheet'; // Nova rota para a ficha final
+  static const payment = '/payment'; // Nova rota para pagamento premium
 }

@@ -10,25 +10,36 @@ const double titleFontSize = 50.0;
 const double itemFontSize = 26.0;
 const double buttonFontSize = 32.0;
 
-  // Função para normalizar nomes para assets
-  String? normalizeAssetName(String? name) {
-	if (name == null) return null;
-	// Remove acentos e caracteres especiais para nomes de arquivos
-	String normalized = name.toLowerCase().replaceAll(' ', '_');
-	normalized = normalized
-		.replaceAll('á', 'a')
-		.replaceAll('ã', 'a')
-		.replaceAll('â', 'a')
-		.replaceAll('é', 'e')
-		.replaceAll('ê', 'e')
-		.replaceAll('í', 'i')
-		.replaceAll('ó', 'o')
-		.replaceAll('ô', 'o')
-		.replaceAll('õ', 'o')
-		.replaceAll('ú', 'u')
-		.replaceAll('ç', 'c');
-	return normalized;
-  }
+// Função para normalizar nomes para assets
+String? normalizeAssetName(String? name) {
+  if (name == null) return null;
+  
+  // Primeiro, normaliza acentos e converte para minúsculas
+  String normalized = name
+      .toLowerCase()
+      .replaceAll(RegExp(r'[áàãâä]'), 'a')
+      .replaceAll(RegExp(r'[éèêë]'), 'e')
+      .replaceAll(RegExp(r'[íìîï]'), 'i')
+      .replaceAll(RegExp(r'[óòõôö]'), 'o')
+      .replaceAll(RegExp(r'[úùûü]'), 'u')
+      .replaceAll(RegExp(r'[ç]'), 'c');
+  
+  // Converte espaços e hífens para underscores
+  normalized = normalized
+      .replaceAll(RegExp(r'\s+'), '_')  // espaços múltiplos -> underscore
+      .replaceAll('-', '_');           // hífens -> underscore
+  
+  // Remove caracteres especiais exceto letras, números e underscores
+  normalized = normalized.replaceAll(RegExp(r'[^a-z0-9_]'), '');
+  
+  // Mapeamento especial apenas para casos realmente excepcionais
+  final Map<String, String> specialMappings = {
+    'meio_elfo': 'meio_elfo',  // já correto, mas garantindo
+    'meio_orc': 'meio_orc',    // já correto, mas garantindo
+  };
+  
+  return specialMappings[normalized] ?? normalized;
+}
 
 class SummaryScreen extends StatelessWidget {
   const SummaryScreen({super.key});
@@ -126,6 +137,16 @@ void _mostrarSnackBar(BuildContext context, String mensagem,
 	final race = SelectionManager.selectedRace.value;
 	final classe = SelectionManager.selectedClass.value;
 	final background = SelectionManager.selectedBackground.value;
+
+	// DEBUG: Log dos caminhos das imagens
+	print('=== DEBUG IMAGENS SUMMARY ===');
+	print('Raça: "$race" -> "${normalizeAssetName(race)}"');
+	print('Classe: "$classe" -> "${normalizeAssetName(classe)}"');  
+	print('Antecedente: "$background" -> "${normalizeAssetName(background)}"');
+	print('Caminho raça: "lib/assets/images/racas/${normalizeAssetName(race) ?? 'race'}.png"');
+	print('Caminho classe: "lib/assets/images/classes/${normalizeAssetName(classe) ?? 'class'}.png"');
+	print('Caminho antecedente: "lib/assets/images/antecedentes/${normalizeAssetName(background) ?? 'background'}.png"');
+	print('========================');
 
 	// NOVO: Calcula os atributos FINAIS (base + bônus)
 	final atributosFinais = _calcularAtributosFinais();

@@ -13,6 +13,7 @@ import 'screens/character/background_detail_screen.dart';
 import 'screens/ficha/summary_screen.dart';
 import 'screens/character/attributes_screen.dart';
 import 'screens/ficha_pronta/ficha_pronta.dart';
+import 'screens/payment/payment_screen.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -38,7 +39,8 @@ class MyApp extends StatelessWidget {
         AppRoutes.backgroundDetailScreen: (_) => const BackgroundDetailScreen(),
         AppRoutes.summaryScreen: (_) => const SummaryScreen(),
         AppRoutes.attributeScreen: (_) => const AttributesScreen(),
-        AppRoutes.characterSheet: (_) => const CharacterSheet(), // Nova rota para a ficha final
+        AppRoutes.characterSheet: (_) => const CharacterSheet(), // Nova rota para a ficha final (sem personagem existente)
+        AppRoutes.payment: (_) => const PaymentScreen(), // Nova rota para pagamento premium
       },
     );
   }

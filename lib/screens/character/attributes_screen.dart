@@ -576,13 +576,13 @@ class _AttributesScreenState extends State<AttributesScreen> {
                     onPressed: _mostrarAjuda,
                     child: Text("Ajuda",
                         style: GoogleFonts.jimNightshade(
-                            fontSize: buttonFontSize, color: Colors.black)),
+                            fontSize: buttonFontSize, color: Colors.white)),
                   ),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: pontosUsados == maxPontos
                           ? Colors.grey.withOpacity(0.4)
-                          : Colors.grey.withOpacity(0.2),
+                          : Colors.grey.shade800,
                       minimumSize: const Size(150, 70),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
@@ -606,7 +606,8 @@ class _AttributesScreenState extends State<AttributesScreen> {
                     },
                     child: Text("Próximo",
                         style: GoogleFonts.jimNightshade(
-                            fontSize: buttonFontSize, color: Colors.black)),
+                            fontSize: buttonFontSize, 
+                            color: pontosUsados == maxPontos ? Colors.white : Colors.black)),
                   ),
                 ],
               ),

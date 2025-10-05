@@ -55,7 +55,7 @@ class MyApp extends StatelessWidget {
         AppRoutes.backgroundDetailScreen: (_) => const BackgroundDetailScreen(),
         AppRoutes.summaryScreen: (_) => const SummaryScreen(),
         AppRoutes.attributeScreen: (_) => const AttributesScreen(),
-        AppRoutes.characterSheet: (_) => const CharacterSheet(), // Nova rota para a ficha final
+        AppRoutes.characterSheet: (_) => const CharacterSheet(), // Nova rota para a ficha final (sem personagem existente)
         
       },
     );

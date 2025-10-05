@@ -2,6 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:app_rpg/services/subscription_service.dart';
+import 'package:app_rpg/screens/payment/payment_screen.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -210,7 +212,7 @@ void _mostrarSnackBar(BuildContext context, String mensagem,
 }
 
 // Função para validar cadastro
-void _validarCadastro(BuildContext context) {
+void _validarCadastro(BuildContext context) async {
   String nome = nomeController.text.trim();
   String email = emailController.text.trim();
   String telefone = telefoneController.text.trim();
@@ -241,15 +243,70 @@ void _validarCadastro(BuildContext context) {
     return;
   }
 
-  // Se passou na validação
-  _mostrarSnackBar(
-    context,
-    "Cadastro realizado com sucesso!",
-    icone: Icons.check_circle_outline,
-    cor: Colors.green,
-  );
+  try {
+    // Salva o tipo de armazenamento escolhido
+    await SubscriptionService.setStorageType(storageOption);
+    
+    // Se escolheu armazenamento na nuvem, navega para pagamento
+    if (storageOption == "cloud") {
+      _mostrarSnackBar(
+        context,
+        "Redirecionando para pagamento premium...",
+        icone: Icons.payment,
+        cor: Colors.amber,
+      );
+      
+      // Pequeno delay para mostrar a mensagem
+      await Future.delayed(const Duration(seconds: 1));
+      
+      // Navega para a tela de pagamento
+      final paymentResult = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const PaymentScreen(fromSignup: true),
+        ),
+      );
+      
+      // Se o pagamento foi bem-sucedido, continua
+      if (paymentResult == true || mounted) {
+        _mostrarSnackBar(
+          context,
+          "Cadastro Premium realizado com sucesso! Bem-vindo! 🎉",
+          icone: Icons.workspace_premium,
+          cor: Colors.amber,
+        );
+      } else {
+        // Se cancelou o pagamento, volta para versão gratuita
+        await SubscriptionService.setStorageType("local");
+        await SubscriptionService.setPremiumStatus(false);
+        _mostrarSnackBar(
+          context,
+          "Cadastro realizado como versão gratuita (máximo 2 personagens)",
+          icone: Icons.check_circle_outline,
+          cor: Colors.green,
+        );
+      }
+    } else {
+      await SubscriptionService.setPremiumStatus(false);
+      _mostrarSnackBar(
+        context,
+        "Cadastro realizado com sucesso! (Versão gratuita - máximo 2 personagens)",
+        icone: Icons.check_circle_outline,
+        cor: Colors.green,
+      );
+    }
 
-  // Depois pode salvar em banco de dados/local/nuvem
-  Navigator.pop(context);
+    // Pequeno delay para mostrar a mensagem
+    await Future.delayed(const Duration(seconds: 2));
+    
+    Navigator.pop(context);
+  } catch (e) {
+    _mostrarSnackBar(
+      context,
+      "Erro ao processar cadastro: $e",
+      icone: Icons.error_outline,
+      cor: Colors.red,
+    );
+  }
 }
 }

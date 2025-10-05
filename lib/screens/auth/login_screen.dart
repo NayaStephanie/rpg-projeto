@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use
+// ignore_for_file: deprecated_member_use, unused_element
 
 import 'package:app_rpg/screens/home/home_screen.dart';
 import 'package:flutter/material.dart';

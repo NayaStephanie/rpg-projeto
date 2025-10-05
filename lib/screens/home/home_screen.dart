@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:app_rpg/screens/about/about_screen.dart';
 import 'package:app_rpg/screens/character/race_list_screen.dart';
+import 'package:app_rpg/screens/characters/characters_list_screen.dart';
+import 'package:app_rpg/screens/support/support_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -42,7 +44,29 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 70),
-                _buildMenuButton(context, "Personagens", () {}),
+                _buildMenuButton(context, "Personagens", () {
+                  Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      transitionDuration: const Duration(milliseconds: 700),
+                      pageBuilder: (context, animation, secondaryAnimation) => const CharactersListScreen(),
+                      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                        const begin = Offset(1.0, 0.0);
+                        const end = Offset.zero;
+                        final tween = Tween(begin: begin, end: end);
+                        final curvedAnimation = CurvedAnimation(
+                          parent: animation,
+                          curve: Curves.easeInOut,
+                        );
+
+                        return SlideTransition(
+                          position: tween.animate(curvedAnimation),
+                          child: child,
+                        );
+                      },
+                    ),
+                  );
+                }),
                 const SizedBox(height: 50),
                 _buildMenuButton(context, "Criar", () {
                  Navigator.push(
@@ -69,7 +93,11 @@ class HomeScreen extends StatelessWidget {
 
                 }),
                 const SizedBox(height: 50),
-                _buildMenuButton(context, "Suporte", () {}),
+                _buildMenuButton(context, "Suporte", () {
+                  Navigator.push(context, MaterialPageRoute(
+                    builder: (context) => const SupportScreen(),
+                  ));
+                }),
 
                 const SizedBox(height: 50),
                 _buildMenuButton(context, "Sobre o App", () {
