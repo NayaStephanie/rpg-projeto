@@ -1,5 +1,6 @@
 // ignore_for_file: deprecated_member_use
 
+import 'package:app_rpg/screens/home/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../recuperar/recuperar_senha_screen.dart';
@@ -21,6 +22,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final String _mockEmail = "teste@rpg.com";
   final String _mockSenha = "1234";
 
+  //Pausado apenas para ficar mais facil de testar
   void _login() {
     if (_formKey.currentState!.validate()) {
       if (emailController.text == _mockEmail &&
@@ -139,7 +141,15 @@ class _LoginScreenState extends State<LoginScreen> {
                         fontSize: 26,
                       ),
                     ),
-                    onPressed: _login,
+                    onPressed:(){
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const HomeScreen(),
+                        ),
+                      );
+                    },
+                    //_login,
                     child: const Text("Entrar"),
                   ),
                   const SizedBox(height: 45),

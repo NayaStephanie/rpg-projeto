@@ -19,6 +19,7 @@ class RaceDetailScreen extends StatelessWidget {
         "Herança feérica: vantagem contra encantamentos e imunidade a sono mágico.\n\n"
         "Versatilidade de talentos: proficiência em duas perícias extras.\n\n"
         "Idiomas: comum, élfico e mais um idioma à sua escolha.",
+    //Elfo tem três sub-raças, Drow, Alto Elfo e Elfo da Floresta, sendo que os dois primeiros ganham magia com nivel
     "Elfo":
         "Elfos são conhecidos por sua longevidade, visão aguçada e forte conexão com a magia. Valorizam a arte e a natureza, sendo rápidos e atentos em qualquer ambiente.\n\n"
         "Graça élfica: +2 em Destreza.\n\n"
@@ -29,6 +30,7 @@ class RaceDetailScreen extends StatelessWidget {
         "Tradição feérica: vantagem contra encantamentos e imunidade a efeitos mágicos de sono.\n\n"
         "Sentidos aguçados: proficiência em Percepção.\n\n"
         "Idiomas: comum e élfico.",
+    //Tratar Humano para tambem poder escolher sua variante (Depois que incluirmos os talentos)
     "Humano":
       "Extremamente diversos, os humanos prosperam em todas as partes do mundo.Sua capacidade de adaptação os torna aventureiros ousados e criativos.\n\n"
       "Atributos adaptáveis: humanos recebem +1 em todos os atributos, refletindo sua versatilidade.\n\n"
@@ -37,6 +39,7 @@ class RaceDetailScreen extends StatelessWidget {
       "Tamanho e peso: entre 1,50m e 2,00m, peso médio 70kg.\n\n"
       "Versatilidade: adaptáveis a qualquer situação, os humanos podem se destacar em diferentes funções.\n\n"
       "Idiomas: sabem falar comum e um idioma adicional à escolha.",
+    //Halfling tem duas sub-raças, Pés Leves e Robusto
     "Halfling":
         "Pequenos e ágeis, os halflings têm um espírito otimista e acolhedor. Preferem uma vida tranquila, mas quando aventureiros, destacam-se pela sorte e agilidade.\n\n"
         "Pequenos e ágeis: +2 em Destreza.\n\n"
@@ -57,6 +60,7 @@ class RaceDetailScreen extends StatelessWidget {
         "Resistência incansável: quando reduzido a 0 PV, pode permanecer em 1 PV uma vez por descanso longo.\n\n"
         "Ataques selvagens: ao conseguir um acerto crítico com arma corpo a corpo, rola um dado adicional de dano.\n\n"
         "Idiomas: comum e orc.",
+    //Anão tem três sub raças, Duergar, Anão da Montanha e Anão da Colina
     "Anão":
         "De estatura baixa e coração firme, os anões são famosos por sua habilidade em forjar armas e armaduras. Sua disciplina e honra os tornam aliados leais\n\n"
         "Força da montanha: +2 em Constituição.\n\n"
@@ -70,6 +74,7 @@ class RaceDetailScreen extends StatelessWidget {
         "Treino em combate: proficiência com machados de batalha, martelos leves e martelos de guerra.\n\n"
         "Tradição das ferramentas: proficiência em uma ferramenta de artesão à escolha: Ferreiro, Pedreiro ou Cervejeiro.\n\n"
         "Idiomas: comum e anão.",
+    //Precisamos entender como vamos fazer para adicionar as cores de dragão
     "Draconato":
         "Descendentes de dragões, os draconatos têm sangue poderoso em suas veias. Exalam força e orgulho, e muitos carregam consigo a habilidade de soltar um sopro elemental.\n\n"
         "Força dracônica: +2 em Força e +1 em Carisma.\n\n"
@@ -80,6 +85,7 @@ class RaceDetailScreen extends StatelessWidget {
         "Arma de sopro: podem exalar energia elemental (dano e área variam conforme o ancestral). Uma vez por descanso pode fazer um sopro que causa 2d6 (resistência de DES metade, CD 8 + Proficiência + CON). Esse dano aumenta em 1d6 aos níveis 6, 11 e 16.\n\n"
         "Resistência dracônica: resistência ao tipo de dano do ancestral.\n\n"
         "Idiomas: comum e dracônico.",
+    //Tiefling ganha magias conforme nivel
     "Tiefling":
         "Marcados por uma herança infernal, os tieflings enfrentam preconceito, mas possuem determinação e carisma únicos. Muitos se voltam para a magia e para seu destino misterioso.\n\n"
         "Herança infernal: +2 em Carisma e +1 em Inteligência.\n\n"
@@ -90,6 +96,7 @@ class RaceDetailScreen extends StatelessWidget {
         "Resistência infernal: resistência a dano de fogo.\n\n"
         "Magia inata: aprendem pequenos truques mágicos, que evoluem com o nível.\n\n"
         "Idiomas: comum e infernal.",
+    //Gnomos tem duas sub-raças, Gnomo das Florestas e Gnomo das Rochas
     "Gnomo":
         "Pequenos em tamanho, mas grandes em curiosidade. Os gnomos adoram invenções, truques e mistérios. São brincalhões, mas também sábios e engenhosos.\n\n"
         "Inteligência aguçada: +2 em Inteligência e +1 em Destreza ou Constituição, à escolha.\n\n"
