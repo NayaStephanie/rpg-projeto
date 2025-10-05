@@ -113,8 +113,8 @@ class _AttributesScreenState extends State<AttributesScreen> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(15),
         ),
-        duration: const Duration(seconds: 3),
-      ),
+          duration: const Duration(seconds: 3),
+        ),
     );
   }
 
@@ -123,13 +123,31 @@ class _AttributesScreenState extends State<AttributesScreen> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: Text(titulo, style: GoogleFonts.jimNightshade(fontSize: 28)),
+        backgroundColor: Colors.black.withOpacity(0.8),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(18),
+          side: const BorderSide(color: Colors.amber, width: 2),
+        ),
+        title: Text(
+          titulo,
+          style: GoogleFonts.jimNightshade(
+            fontSize: 28,
+            color: Colors.amber,
+          ),
+        ),
         content: Text(
           mensagem,
-          style: GoogleFonts.imFellEnglish(fontSize: 20),
+          style: GoogleFonts.imFellEnglish(
+            fontSize: 20,
+            color: Colors.white,
+          ),
         ),
         actions: [
           TextButton(
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.amber,
+              textStyle: GoogleFonts.imFellEnglish(fontSize: 18),
+            ),
             onPressed: () => Navigator.pop(context),
             child: const Text("OK"),
           ),
@@ -143,8 +161,18 @@ class _AttributesScreenState extends State<AttributesScreen> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: Text("Distribuição de Atributos (Point Buy)",
-            style: GoogleFonts.jimNightshade(fontSize: 28)),
+        backgroundColor: Colors.black.withOpacity(0.8),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(18),
+          side: const BorderSide(color: Colors.amber, width: 2),
+        ),
+        title: Text(
+          "Distribuição de Atributos (Point Buy)",
+          style: GoogleFonts.jimNightshade(
+            fontSize: 28,
+            color: Colors.amber,
+          ),
+        ),
         content: Text(
           "Você começa com todos os atributos em 8 e possui 27 pontos para distribuir.\n\n"
           "Cada aumento custa pontos:\n"
@@ -153,10 +181,17 @@ class _AttributesScreenState extends State<AttributesScreen> {
           "- De 14 para 15 custa 2 pontos.\n\n"
           "O máximo antes dos bônus raciais é 15.\n\n"
           "Dica: use os pontos para fortalecer os atributos que combinam com a classe escolhida!",
-          style: GoogleFonts.imFellEnglish(fontSize: 20),
+          style: GoogleFonts.imFellEnglish(
+            fontSize: 20,
+            color: Colors.white,
+          ),
         ),
         actions: [
           TextButton(
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.amber,
+              textStyle: GoogleFonts.imFellEnglish(fontSize: 18),
+            ),
             onPressed: () => Navigator.pop(context),
             child: const Text("Fechar"),
           ),
@@ -230,7 +265,7 @@ class _AttributesScreenState extends State<AttributesScreen> {
   // Diálogo para Gnomo (+1 DES ou CON)
   void _showGnomeBonusDialog(BuildContext context) {
     String? selectedAttribute;
-    
+
     showDialog<void>(
       context: context,
       barrierDismissible: false,
@@ -238,29 +273,51 @@ class _AttributesScreenState extends State<AttributesScreen> {
         return StatefulBuilder(
           builder: (context, setStateSB) {
             return AlertDialog(
-              title: Text("Bônus Racial de Gnomo", style: GoogleFonts.jimNightshade(fontSize: 28)),
+              backgroundColor: Colors.black.withOpacity(0.8),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(18),
+                side: const BorderSide(color: Colors.amber, width: 2),
+              ),
+              title: Text(
+                "Bônus Racial de Gnomo",
+                style: GoogleFonts.jimNightshade(
+                  fontSize: 28,
+                  color: Colors.amber,
+                ),
+              ),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Seu personagem Gnomo recebe +2 em INT e mais +1 em uma habilidade à sua escolha (Destreza ou Constituição). Selecione onde aplicar o +1:",
-                    style: GoogleFonts.imFellEnglish(fontSize: 20)),
+                  Text(
+                    "Seu personagem Gnomo recebe +2 em INT e mais +1 em uma habilidade à sua escolha (Destreza ou Constituição). Selecione onde aplicar o +1:",
+                    style: GoogleFonts.imFellEnglish(
+                      fontSize: 20,
+                      color: Colors.white,
+                    ),
+                  ),
                   RadioListTile<String>(
-                    title: const Text('Destreza (DES)'),
+                    title: Text('Destreza (DES)', style: GoogleFonts.imFellEnglish(color: Colors.white)),
                     value: 'DES',
                     groupValue: selectedAttribute,
+                    activeColor: Colors.amber,
                     onChanged: (value) => setStateSB(() => selectedAttribute = value),
                   ),
                   RadioListTile<String>(
-                    title: const Text('Constituição (CON)'),
+                    title: Text('Constituição (CON)', style: GoogleFonts.imFellEnglish(color: Colors.white)),
                     value: 'CON',
                     groupValue: selectedAttribute,
+                    activeColor: Colors.amber,
                     onChanged: (value) => setStateSB(() => selectedAttribute = value),
                   ),
                 ],
               ),
               actions: <Widget>[
                 TextButton(
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.amber,
+                    textStyle: GoogleFonts.imFellEnglish(fontSize: 18),
+                  ),
                   onPressed: selectedAttribute == null
                       ? null
                       : () {
@@ -281,7 +338,7 @@ class _AttributesScreenState extends State<AttributesScreen> {
   // Diálogo para Meio-Elfo (+1 em Duas Habilidades)
   void _showHalfElfBonusDialog(BuildContext context) {
     Map<String, int> tempBonus = {};
-    
+
     showDialog<void>(
       context: context,
       barrierDismissible: false,
@@ -293,40 +350,83 @@ class _AttributesScreenState extends State<AttributesScreen> {
             final selectedCount = tempBonus.keys.length;
 
             return AlertDialog(
-              title: Text("Bônus Racial de Meio-Elfo", style: GoogleFonts.jimNightshade(fontSize: 28)),
+              backgroundColor:  Colors.black.withOpacity(0.8),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(18),
+                side: const BorderSide(color: Colors.amber, width: 2),
+              ),
+              title: Text(
+                "Bônus Racial de Meio-Elfo",
+                style: GoogleFonts.jimNightshade(
+                  fontSize: 28,
+                  color: Colors.amber,
+                ),
+              ),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Seu personagem Meio-Elfo recebe +2 em CAR e mais +1 em duas outras habilidades à sua escolha. Selecione as duas habilidades:",
-                    style: GoogleFonts.imFellEnglish(fontSize: 20)),
+                  Text(
+                    "Seu personagem Meio-Elfo recebe +2 em CAR e mais +1 em duas outras habilidades à sua escolha. Selecione as duas habilidades:",
+                    style: GoogleFonts.imFellEnglish(
+                      fontSize: 20,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
                   ...availableAttributes.map((attr) {
                     final isSelected = tempBonus.containsKey(attr);
-                    
-                    return CheckboxListTile(
-                      title: Text(attr),
-                      value: isSelected,
-                      onChanged: (bool? value) {
-                        setStateSB(() {
-                          if (value == true) {
-                            if (selectedCount < 2) {
-                              tempBonus[attr] = 1;
+
+                    return Theme(
+                      data: Theme.of(context).copyWith(
+                        unselectedWidgetColor: Colors.amber,
+                        checkboxTheme: CheckboxThemeData(
+                          fillColor: MaterialStateProperty.all(Colors.amber),
+                          checkColor: MaterialStateProperty.all(Colors.black),
+                        ),
+                      ),
+                      child: CheckboxListTile(
+                        title: Text(
+                          attr,
+                          style: GoogleFonts.imFellEnglish(
+                            color: Colors.white,
+                            fontSize: 18,
+                          ),
+                        ),
+                        value: isSelected,
+                        onChanged: (bool? value) {
+                          setStateSB(() {
+                            if (value == true) {
+                              if (selectedCount < 2) {
+                                tempBonus[attr] = 1;
+                              }
+                            } else {
+                              tempBonus.remove(attr);
                             }
-                          } else {
-                            tempBonus.remove(attr);
-                          }
-                        });
-                      },
-                      controlAffinity: ListTileControlAffinity.leading,
-                      // Desabilita caixas de seleção se já tiver 2 e não for a atual
-                      enabled: isSelected || selectedCount < 2,
+                          });
+                        },
+                        controlAffinity: ListTileControlAffinity.leading,
+                        enabled: isSelected || selectedCount < 2,
+                        activeColor: Colors.amber,
+                      ),
                     );
                   }),
-                  Text("Selecionado: $selectedCount/2", style: GoogleFonts.imFellEnglish(fontSize: 18, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 8),
+                  Text(
+                    "Selecionado: $selectedCount/2",
+                    style: GoogleFonts.imFellEnglish(
+                      fontSize: 18,
+                      color: Colors.amber,
+                    ),
+                  ),
                 ],
               ),
               actions: <Widget>[
                 TextButton(
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.amber,
+                    textStyle: GoogleFonts.imFellEnglish(fontSize: 18),
+                  ),
                   onPressed: selectedCount != 2
                       ? null
                       : () {
@@ -344,7 +444,6 @@ class _AttributesScreenState extends State<AttributesScreen> {
       },
     );
   }
-  
   // --- FIM LÓGICA DE BÔNUS RACIAL ---
 
   @override

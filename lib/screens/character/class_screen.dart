@@ -188,34 +188,41 @@ class _ClassScreenState extends State<ClassScreen> {
               // Botão Próximo
               Padding(
                 padding: const EdgeInsets.all(20),
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey.withOpacity(0.4),
-                    minimumSize: const Size(150, 70),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  onPressed: () {
-                    if (SelectionManager.selectedClass.value == null) {
-                      _mostrarSnackBar(
-                        context,
-                        "Por favor, selecione uma classe antes de prosseguir.",
-                        icone: Icons.warning_amber_rounded,
-                        cor: Colors.orange,
-                      );
-                    } else {
-                      // Próxima tela do fluxo
-                      Navigator.pushNamed(context, AppRoutes.backgroundScreen);
-                    }
+                child: ValueListenableBuilder<String?>(
+                  valueListenable: SelectionManager.selectedClass,
+                  builder: (context, selectedClass, _) {
+                    final isSelected = selectedClass != null;
+                    return ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: isSelected
+                            ? Colors.grey.withOpacity(0.4)
+                            : Colors.grey.shade800,
+                        minimumSize: const Size(150, 70),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      onPressed: isSelected
+                          ? () {
+                              Navigator.pushNamed(context, AppRoutes.backgroundScreen);
+                            }
+                          : () {
+                              _mostrarSnackBar(
+                                context,
+                                "Por favor, selecione uma classe antes de prosseguir.",
+                                icone: Icons.warning_amber_rounded,
+                                cor: Colors.orange,
+                              );
+                            },
+                      child: Text(
+                        isSelected ? "Próximo" : "Próximo",
+                        style: GoogleFonts.jimNightshade(
+                          fontSize: buttonFontSize,
+                          color: isSelected ? Colors.white : Colors.black,
+                        ),
+                      ),
+                    );
                   },
-                  child: Text(
-                    "Próximo",
-                    style: GoogleFonts.jimNightshade(
-                      fontSize: buttonFontSize,
-                      color: Colors.black,
-                    ),
-                  ),
                 ),
               ),
             ],

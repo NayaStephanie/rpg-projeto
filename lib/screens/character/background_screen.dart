@@ -189,39 +189,47 @@ class _BackgroundScreenState extends State<BackgroundScreen> {
               // Botão Próximo
               Padding(
                 padding: const EdgeInsets.all(20),
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey.withOpacity(0.4),
+                child: ValueListenableBuilder<String?>(
+                  valueListenable: SelectionManager.selectedBackground,
+                  builder: (context, selected, _) {
+                  final isSelected = selected != null;
+                  return ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                    backgroundColor: isSelected
+                      ? Colors.grey.withOpacity(0.4)
+                      : Colors.grey.shade800, // escuro quando desabilitado
                     minimumSize: const Size(150, 70),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
-                  ),
-                  onPressed: () {
-                    if (SelectionManager.selectedBackground.value == null) {
+                    ),
+                    onPressed: () {
+                    if (!isSelected) {
                       _mostrarSnackBar(
-                        context,
-                        "Por favor, selecione um antecedente antes de prosseguir.",
-                        icone: Icons.warning_amber_rounded,
-                        cor: Colors.orange,
+                      context,
+                      "Por favor, selecione um antecedente antes de prosseguir.",
+                      icone: Icons.warning_amber_rounded,
+                      cor: Colors.orange,
                       );
                     } else {
                       // Próxima tela do fluxo
                       Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const AttributesScreen(),
-                        ),
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const AttributesScreen(),
+                      ),
                       );
                     }
-                  },
-                  child: Text(
-                    "Próximo",
+                    },
+                    child: Text(
+                    isSelected ? "Próximo" : "Próximo",
                     style: GoogleFonts.jimNightshade(
                       fontSize: buttonFontSize,
-                      color: Colors.black,
+                      color: isSelected ? Colors.white : Colors.black,
                     ),
-                  ),
+                    ),
+                  );
+                  },
                 ),
               ),
             ],

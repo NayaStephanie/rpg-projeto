@@ -183,40 +183,48 @@ class _RaceScreenState extends State<RaceScreen> {
               const SizedBox(height: 20),
 
               // Botão Próximo
-              Padding(
+                Padding(
                 padding: const EdgeInsets.all(20),
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey.withOpacity(0.4),
+                child: ValueListenableBuilder<String?>(
+                  valueListenable: SelectionManager.selectedRace,
+                  builder: (context, selectedRace, _) {
+                  final isSelected = selectedRace != null;
+                  return ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                    backgroundColor: isSelected
+                      ? Colors.grey.withOpacity(0.4)
+                      : Colors.grey.shade800,
                     minimumSize: const Size(150, 70),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
-                  ),
-                  onPressed: () {
-                    if (SelectionManager.selectedRace.value == null) {
+                    ),
+                    onPressed: () {
+                    if (!isSelected) {
                       _mostrarSnackBar(
-                        context,
-                        "Por favor, selecione uma raça antes de prosseguir.",
-                        icone: Icons.warning_amber_rounded,
-                        cor: Colors.orange,
+                      context,
+                      "Por favor, selecione uma raça antes de prosseguir.",
+                      icone: Icons.warning_amber_rounded,
+                      cor: Colors.orange,
                       );
-                    } else {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ClassScreen(),
-                        ),
-                      );
+                      return;
                     }
-                  },
-                  child: Text(
-                    "Próximo",
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                      builder: (context) => const ClassScreen(),
+                      ),
+                    );
+                    },
+                    child: Text(
+                    isSelected ? "Próximo" : "Próximo",
                     style: GoogleFonts.jimNightshade(
                       fontSize: buttonFontSize,
-                      color: Colors.black,
+                      color: isSelected ? Colors.white : Colors.black,
                     ),
-                  ),
+                    ),
+                  );
+                  },
                 ),
               ),
             ],

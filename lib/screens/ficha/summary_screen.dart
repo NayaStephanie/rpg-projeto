@@ -280,7 +280,7 @@ void _mostrarSnackBar(BuildContext context, String mensagem,
       },
 			child: Text(
 			  "Finalizar",
-			  style: GoogleFonts.imFellEnglish(
+			  style: GoogleFonts.jimNightshade(
 				fontSize: buttonFontSize,
 				color: Colors.white,
 			  ),
