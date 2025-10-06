@@ -22,40 +22,52 @@ class _LoginScreenState extends State<LoginScreen> {
   final String _mockEmail = "teste@rpg.com";
   final String _mockSenha = "1234";
 
-  //Pausado apenas para ficar mais facil de testar
+  @override
+  void initState() {
+    super.initState();
+    // Pré-preenche o campo de e-mail com o mock para facilitar testes
+    emailController.text = _mockEmail;
+  }
+
   void _login() {
     if (_formKey.currentState!.validate()) {
-      if (emailController.text == _mockEmail &&
-          senhaController.text == _mockSenha) {
+      final email = emailController.text.trim();
+      final senha = senhaController.text.trim();
+
+      if (email == _mockEmail && senha == _mockSenha) {
         // Login bem-sucedido → vai para a home
-        Navigator.pushReplacementNamed(context, '/home');
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+        );
       } else {
         // Mostra erro se email/senha não conferem
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Email ou senha incorretos")),
+          SnackBar(
+            content: Text(
+              "Email ou senha incorretos",
+              style: GoogleFonts.imFellEnglish(color: Colors.white, fontSize: 18),
+            ),
+            backgroundColor: Colors.red.withOpacity(0.8),
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
         );
       }
     }
   }
 
   String? _validarEmail(String? value) {
-    if (value == null || value.isEmpty) {
-      return "Informe seu email";
-    }
+    if (value == null || value.isEmpty) return "Informe seu email";
     final regex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
-    if (!regex.hasMatch(value)) {
-      return "Digite um email válido";
-    }
+    if (!regex.hasMatch(value)) return "Digite um email válido";
     return null;
   }
 
   String? _validarSenha(String? value) {
-    if (value == null || value.isEmpty) {
-      return "Informe sua senha";
-    }
-    if (value.length < 4) {
-      return "Senha muito curta";
-    }
+    if (value == null || value.isEmpty) return "Informe sua senha";
+    if (value.length < 4) return "Senha muito curta";
     return null;
   }
 
@@ -137,19 +149,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      textStyle: GoogleFonts.imFellEnglish(
-                        fontSize: 26,
-                      ),
+                      textStyle: GoogleFonts.imFellEnglish(fontSize: 26),
                     ),
-                    onPressed:(){
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const HomeScreen(),
-                        ),
-                      );
-                    },
-                    //_login,
+                    onPressed: _login, // usa o mock
                     child: const Text("Entrar"),
                   ),
                   const SizedBox(height: 45),
@@ -163,9 +165,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      textStyle: GoogleFonts.imFellEnglish(
-                        fontSize: 26,
-                      ),
+                      textStyle: GoogleFonts.imFellEnglish(fontSize: 26),
                     ),
                     onPressed: () {
                       Navigator.push(
