@@ -51,7 +51,7 @@ class _CharacterSheetState extends State<CharacterSheet> {
   int _level = 1;
   String _race = "Humano";
   String _characterClass = "Guerreiro";
-  bool _inspiracao = false;
+  int _inspiracao = 0;
 
   // Adiciona variáveis para tesouro
   int _gold = 0;
@@ -278,6 +278,7 @@ void _loadExistingCharacterData(CharacterModel character) {
     }
     
     // Outros dados
+    _inspiracao = character.inspiration;
     _gold = character.gold;
     _silver = character.silver;
     _copper = character.copper;
@@ -2445,66 +2446,130 @@ Widget _infoDisplay(String title, String value) {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                        margin: const EdgeInsets.all(6),
-                        decoration: BoxDecoration(
-                          color: _inspiracao
-                              ? const Color.fromARGB(255, 240, 183, 82).withOpacity(0.6)
-                              : Colors.grey.shade800.withOpacity(0.7),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: Colors.amber.shade700,
-                            width: 2,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
-                              blurRadius: 4,
-                              offset: const Offset(2, 2),
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.star,
-                                  color: _inspiracao ? Colors.white : Colors.amber.shade200,
-                                  size: 14,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  "Inspiração",
-                                  style: GoogleFonts.jimNightshade(
-                                    fontSize: 18,
-                                    color: Colors.white,
-                                    shadows: [
-                                      Shadow(
-                                        offset: const Offset(1, 1),
-                                        blurRadius: 2,
-                                        color: Colors.brown.withOpacity(0.7),
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(8),
+                        onTap: () async {
+                          final result = await showDialog<int>(
+                            context: context,
+                            builder: (dialogContext) {
+                              int tempInspiration = _inspiracao;
+                              return StatefulBuilder(
+                                builder: (context, setDialogState) {
+                                  return AlertDialog(
+                                    backgroundColor: Colors.grey.shade900,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(18),
+                                      side: BorderSide(color: Colors.amber.shade700, width: 3),
+                                    ),
+                                    title: Text(
+                                      "Alterar Inspiração",
+                                      style: GoogleFonts.imFellEnglish(color: Colors.amber),
+                                    ),
+                                    content: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        IconButton(
+                                          icon: Icon(Icons.remove, color: tempInspiration > 0 ? Colors.amber : Colors.grey),
+                                          onPressed: tempInspiration > 0
+                                            ? () => setDialogState(() => tempInspiration--)
+                                            : null,
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                                          child: Text(
+                                            tempInspiration.toString(),
+                                            style: GoogleFonts.cinzel(fontSize: 28, color: Colors.white),
+                                          ),
+                                        ),
+                                        IconButton(
+                                          icon: Icon(Icons.add, color: tempInspiration < 99 ? Colors.amber : Colors.grey),
+                                          onPressed: tempInspiration < 99
+                                            ? () => setDialogState(() => tempInspiration++)
+                                            : null,
+                                        ),
+                                      ],
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        child: Text("Cancelar", style: GoogleFonts.imFellEnglish(color: Colors.white)),
+                                        onPressed: () => Navigator.pop(dialogContext),
+                                      ),
+                                      ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.amber.shade700,
+                                        ),
+                                        child: Text("OK", style: GoogleFonts.imFellEnglish(color: Colors.black)),
+                                        onPressed: () => Navigator.pop(dialogContext, tempInspiration),
                                       ),
                                     ],
+                                  );
+                                },
+                              );
+                            },
+                          );
+                          if (result != null && result != _inspiracao) {
+                            setState(() {
+                              _inspiracao = result;
+                            });
+                          }
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                          margin: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade800.withOpacity(0.7),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: Colors.amber.shade700,
+                              width: 2,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.2),
+                                blurRadius: 4,
+                                offset: const Offset(2, 2),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.star,
+                                    color: Colors.amber.shade200,
+                                    size: 14,
                                   ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    "Inspiração",
+                                    style: GoogleFonts.jimNightshade(
+                                      fontSize: 18,
+                                      color: Colors.white,
+                                      shadows: [
+                                        Shadow(
+                                          offset: const Offset(1, 1),
+                                          blurRadius: 2,
+                                          color: Colors.brown.withOpacity(0.7),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                _inspiracao.toString(),
+                                style: GoogleFonts.jimNightshade(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.amber.shade200,
                                 ),
-                              ],
-                            ),
-                            const SizedBox(height: 1),
-                            Switch(
-                              value: _inspiracao,
-                              activeColor: Colors.amber.shade700,
-                              inactiveThumbColor: Colors.grey.shade600,
-                              onChanged: (val) {
-                                setState(() {
-                                  _inspiracao = val;
-                                });
-                              },
-                            ),
-                          ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),

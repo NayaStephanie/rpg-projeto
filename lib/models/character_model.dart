@@ -16,7 +16,7 @@ class CharacterModel {
   final Map<String, bool> selectedCantrips;
   final Map<int, int> maxSpellSlots;
   final Map<int, int> usedSpellSlots;
-  final bool inspiration;
+  final int inspiration;
   final int gold;
   final int silver;
   final int copper;
@@ -106,7 +106,9 @@ class CharacterModel {
           .map((key, value) => MapEntry(int.parse(key), value as int)),
       usedSpellSlots: (json['usedSpellSlots'] as Map<String, dynamic>)
           .map((key, value) => MapEntry(int.parse(key), value as int)),
-      inspiration: json['inspiration'],
+      inspiration: json['inspiration'] is bool 
+          ? (json['inspiration'] as bool ? 1 : 0)  // Converte bool antigo para int
+          : json['inspiration'] as int? ?? 0,      // Usa int se já estiver no novo formato
       gold: json['gold'],
       silver: json['silver'],
       copper: json['copper'],
@@ -136,7 +138,7 @@ class CharacterModel {
     Map<String, bool>? selectedCantrips,
     Map<int, int>? maxSpellSlots,
     Map<int, int>? usedSpellSlots,
-    bool? inspiration,
+    int? inspiration,
     int? gold,
     int? silver,
     int? copper,
