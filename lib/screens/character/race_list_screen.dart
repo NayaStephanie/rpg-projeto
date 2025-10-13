@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:app_rpg/screens/character/race_detail_screen.dart';
 import 'package:app_rpg/screens/character/class_screen.dart';
 import 'package:app_rpg/selection_manager.dart';
+import '../../utils/app_localizations.dart';
 
 // Constantes para padronizar
 const double titleFontSize = 80.0;
@@ -19,11 +20,16 @@ class RaceScreen extends StatefulWidget {
 
 class _RaceScreenState extends State<RaceScreen> {
   
+  String _getTranslatedText(String key) {
+    final localizations = AppLocalizations.of(context);
+    return localizations?.translate(key) ?? key;
+  }
+  
   @override
   void initState() {
     super.initState();
     // Limpa todas as seleções quando inicia uma nova criação de personagem
-    SelectionManager.clearAllSelections();
+    SelectionManager().clearAllSelections();
   }
 
   // Função para exibir SnackBar customizado
@@ -60,15 +66,15 @@ class _RaceScreenState extends State<RaceScreen> {
  @override
 Widget build(BuildContext context) {
   final races = [
-    {"name": "Meio-Elfo", "img": "lib/assets/images/racas/meio_elfo.png"},
-    {"name": "Elfo", "img": "lib/assets/images/racas/elfo.png"},
-    {"name": "Humano", "img": "lib/assets/images/racas/humano.png"},
-    {"name": "Halfling", "img": "lib/assets/images/racas/halfling.png"},
-    {"name": "Meio-Orc", "img": "lib/assets/images/racas/meio_orc.png"},
-    {"name": "Anão", "img": "lib/assets/images/racas/anao.png"},
-    {"name": "Draconato", "img": "lib/assets/images/racas/draconato.png"},
-    {"name": "Tiefling", "img": "lib/assets/images/racas/tiefling.png"},
-    {"name": "Gnomo", "img": "lib/assets/images/racas/gnomo.png"},
+    {"key": "halfElf", "name": _getTranslatedText("halfElf"), "img": "lib/assets/images/racas/meio_elfo.png"},
+    {"key": "elf", "name": _getTranslatedText("elf"), "img": "lib/assets/images/racas/elfo.png"},
+    {"key": "human", "name": _getTranslatedText("human"), "img": "lib/assets/images/racas/humano.png"},
+    {"key": "halfling", "name": _getTranslatedText("halfling"), "img": "lib/assets/images/racas/halfling.png"},
+    {"key": "halfOrc", "name": _getTranslatedText("halfOrc"), "img": "lib/assets/images/racas/meio_orc.png"},
+    {"key": "dwarf", "name": _getTranslatedText("dwarf"), "img": "lib/assets/images/racas/anao.png"},
+    {"key": "dragonborn", "name": _getTranslatedText("dragonborn"), "img": "lib/assets/images/racas/draconato.png"},
+    {"key": "tiefling", "name": _getTranslatedText("tiefling"), "img": "lib/assets/images/racas/tiefling.png"},
+    {"key": "gnome", "name": _getTranslatedText("gnome"), "img": "lib/assets/images/racas/gnomo.png"},
   ];
 
   return Scaffold(
@@ -95,7 +101,7 @@ Widget build(BuildContext context) {
 
             // Título
             Text(
-              "Raça",
+              _getTranslatedText("race"),
               style: GoogleFonts.jimNightshade(
                 fontSize: titleFontSize,
                 color: Colors.white,
@@ -157,9 +163,11 @@ Widget build(BuildContext context) {
 
                       // O Column do item é reconstruído automaticamente
                       // quando SelectionManager.selectedRace muda
-                      child: ValueListenableBuilder<String?>(
-                        valueListenable: SelectionManager.selectedRace,
-                        builder: (context, selectedRace, _) {
+                      child: AnimatedBuilder(
+                        animation: SelectionManager(),
+                        builder: (context, _) {
+                          final selectionManager = SelectionManager();
+                          final selectedRace = selectionManager.selectedRace;
                           return Column(
                             mainAxisSize: MainAxisSize.min, // evita expandir verticalmente
                             children: [
@@ -202,9 +210,11 @@ Widget build(BuildContext context) {
             // Botão Próximo (agora fora do Grid)
             Padding(
               padding: const EdgeInsets.all(20),
-              child: ValueListenableBuilder<String?>(
-                valueListenable: SelectionManager.selectedRace,
-                builder: (context, selectedRace, _) {
+              child: AnimatedBuilder(
+                animation: SelectionManager(),
+                builder: (context, _) {
+                  final selectionManager = SelectionManager();
+                  final selectedRace = selectionManager.selectedRace;
                   final isSelected = selectedRace != null;
                   return ElevatedButton(
                     style: ElevatedButton.styleFrom(
@@ -217,10 +227,10 @@ Widget build(BuildContext context) {
                       ),
                     ),
                     onPressed: () {
-                      if (SelectionManager.selectedRace.value == null) {
+                      if (SelectionManager().selectedRace == null) {
                         _mostrarSnackBar(
                           context,
-                          "Por favor, selecione uma raça antes de prosseguir.",
+                          _getTranslatedText("pleaseSelectRace"),
                           icone: Icons.warning_amber_rounded,
                           cor: Colors.orange,
                         );
@@ -234,7 +244,7 @@ Widget build(BuildContext context) {
                       }
                     },
                     child: Text(
-                      "Próximo",
+                      _getTranslatedText("next"),
                       style: GoogleFonts.jimNightshade(
                         fontSize: buttonFontSize,
                         color: isSelected ? Colors.white : Colors.black,

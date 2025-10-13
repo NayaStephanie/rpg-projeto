@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use, library_prefixes, unnecessary_to_list_in_spreads, prefer_final_fields, avoid_print
+// ignore_for_file: deprecated_member_use, library_prefixes, unnecessary_to_list_in_spreads, prefer_final_fields, avoid_print, use_build_context_synchronously, unnecessary_import, sort_child_properties_last
 
 import 'package:flutter/material.dart';
 import 'dart:math';
@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:app_rpg/models/armor.dart';
+import 'package:app_rpg/models/equipment_item.dart';
 import 'package:app_rpg/models/race_class_data.dart' as raceClassData;
 import 'package:app_rpg/models/ca_calculator.dart';
 import 'package:app_rpg/models/spells_data.dart';
@@ -16,6 +17,7 @@ import 'package:app_rpg/models/race_features.dart' as raceFeatureData;
 import 'package:app_rpg/models/armor_proficiences.dart';
 import 'package:app_rpg/models/skills_data.dart';
 import 'package:app_rpg/models/saving_throws.dart';
+import 'package:app_rpg/data/languages_data.dart';
 import 'package:app_rpg/selection_manager.dart';
 import 'package:app_rpg/race_bonuses.dart';
 import 'package:app_rpg/models/character_model.dart';
@@ -57,6 +59,9 @@ class _CharacterSheetState extends State<CharacterSheet> {
   int _gold = 0;
   int _silver = 0;
   int _copper = 0;
+
+  // Lista de equipamentos do personagem
+  List<EquipmentItem> _equipment = [];
 
   // Adiciona listas para rastrear sucessos e falhas de salvaguarda contra a morte
   List<bool> _deathSaveSuccesses = [false, false, false];
@@ -100,6 +105,11 @@ class _CharacterSheetState extends State<CharacterSheet> {
   late List<SavingThrow> _savingThrows; // variável para salvaguardas
   int _passivePerception = 10; // valor base
 
+  // Variáveis para idiomas
+  List<String> _knownLanguages = []; // Idiomas atualmente conhecidos
+  List<String> _selectedAdditionalLanguages = []; // Idiomas escolhidos adicionalmente
+  LanguageResult? _languageResult; // Resultado do cálculo de idiomas
+
 // Método auxiliar para obter modificador de atributo
 int _getAttributeModifier(String attribute) {
   switch (attribute.toLowerCase()) {
@@ -136,6 +146,125 @@ int _getMaxCantrips(String characterClass, int level) {
   return maxCantrips;
 }
 
+// MÉTODO: Calcula os idiomas baseado nas escolhas do usuário
+void _calculateLanguages() {
+  // Calcula idiomas automáticos
+  final automaticLanguages = calculateAutomaticLanguages(_race, _characterClass, _background);
+  
+  // Calcula quantos idiomas extras podem ser escolhidos
+  final additionalChoices = calculateTotalLanguageChoices(_race, _characterClass, _background);
+  
+  // Cria o resultado
+  _languageResult = LanguageResult(
+    automaticLanguages: automaticLanguages,
+    additionalChoices: additionalChoices,
+    selectedAdditional: _selectedAdditionalLanguages,
+  );
+  
+  // Atualiza idiomas conhecidos
+  _knownLanguages = _languageResult!.allLanguages;
+}
+
+// MÉTODO: Exibe diálogo para escolher idiomas adicionais
+void _showLanguageSelectionDialog() {
+  if (_languageResult == null || _languageResult!.additionalChoices == 0) {
+    return;
+  }
+  
+  final availableChoices = getAvailableLanguageChoices(_languageResult!.automaticLanguages);
+  
+  showDialog(
+    context: context,
+    builder: (context) => StatefulBuilder(
+      builder: (dialogContext, setDialogState) => AlertDialog(
+        backgroundColor: Colors.grey.shade900,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(18),
+          side: BorderSide(color: Colors.amber.shade700, width: 3),
+        ),
+        title: Text(
+          "Escolher Idiomas Adicionais",
+          style: GoogleFonts.imFellEnglish(color: Colors.amber),
+        ),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                "Escolha ${_languageResult!.additionalChoices} idioma(s) adicional(is):",
+                style: GoogleFonts.cinzel(color: Colors.white),
+              ),
+              Text(
+                "Selecionados: ${_selectedAdditionalLanguages.length}/${_languageResult!.additionalChoices}",
+                style: GoogleFonts.cinzel(color: Colors.amber, fontSize: 12),
+              ),
+              const SizedBox(height: 16),
+              Container(
+                height: 300,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.amber.shade700),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: ListView.builder(
+                  itemCount: availableChoices.length,
+                  itemBuilder: (context, index) {
+                    final language = availableChoices[index];
+                    final isSelected = _selectedAdditionalLanguages.contains(language);
+                    final canSelect = isSelected || _selectedAdditionalLanguages.length < _languageResult!.additionalChoices;
+                    
+                    return ListTile(
+                      title: Text(
+                        language,
+                        style: GoogleFonts.cinzel(
+                          color: canSelect ? Colors.white : Colors.grey,
+                        ),
+                      ),
+                      trailing: Checkbox(
+                        value: isSelected,
+                        activeColor: Colors.amber.shade700,
+                        onChanged: canSelect ? (value) {
+                          setDialogState(() {
+                            if (value == true) {
+                              _selectedAdditionalLanguages.add(language);
+                            } else {
+                              _selectedAdditionalLanguages.remove(language);
+                            }
+                          });
+                        } : null,
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            child: Text("Cancelar", style: GoogleFonts.imFellEnglish(color: Colors.white)),
+            onPressed: () => Navigator.pop(dialogContext),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.amber.shade700,
+            ),
+            child: Text("Confirmar", style: GoogleFonts.imFellEnglish(color: Colors.black)),
+            onPressed: _selectedAdditionalLanguages.length == _languageResult!.additionalChoices
+                ? () {
+                    Navigator.pop(dialogContext);
+                    setState(() {
+                      _calculateLanguages();
+                    });
+                  }
+                : null,
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
 // Função para contar quantos truques estão selecionados
 int _getSelectedCantripsCount(String characterClass) {
   return _selectedCantrips.entries
@@ -159,7 +288,8 @@ void initState() {
     _skillsResult = getSkillsForCharacter(_race, _characterClass, _background);
     
     // Carrega perícias salvas se existirem e não estiverem vazias
-    final savedSkills = SelectionManager.selectedSkills.value;
+    final selectionManager = SelectionManager();
+    final savedSkills = selectionManager.selectedSkills;
     if (savedSkills.isNotEmpty) {
       print('🎯 Ficha: Carregando perícias salvas: ${savedSkills.map((s) => s.name).join(", ")}');
       _skillsResult = SkillsResult(
@@ -196,10 +326,11 @@ void dispose() {
 //MÉTODO: Carrega dados do SelectionManager
 void _loadDataFromSelectionManager() {
   // Pega as seleções (com fallbacks para valores padrão)
-  final selectedRace = SelectionManager.selectedRace.value ?? "Humano";
-  final selectedClass = SelectionManager.selectedClass.value ?? "Guerreiro";
-  final selectedBackground = SelectionManager.selectedBackground.value ?? "Acólito";
-  final selectedAttributes = SelectionManager.selectedAttributes.value;
+  final selectionManager = SelectionManager();
+  final selectedRace = selectionManager.selectedRace ?? "Humano";
+  final selectedClass = selectionManager.selectedClass ?? "Guerreiro";
+  final selectedBackground = selectionManager.selectedBackground ?? "Acólito";
+  final selectedAttributes = selectionManager.selectedAttributes;
   
   // Atualiza as variáveis da ficha
   setState(() {
@@ -207,8 +338,42 @@ void _loadDataFromSelectionManager() {
     _characterClass = selectedClass;
     _background = selectedBackground;
     
+    // Atualiza o ouro automaticamente baseado no antecedente
+    _gold = raceClassData.getInitialGoldByBackground(selectedBackground);
+    
+    // Combina equipamentos do antecedente com os equipamentos iniciais da classe selecionados pelo usuário
+    List<EquipmentItem> allEquipment = [];
+    
+    // Adiciona equipamentos do antecedente
+    allEquipment.addAll(raceClassData.getInitialEquipmentByBackground(selectedBackground));
+    
+    // Adiciona equipamentos iniciais da classe (se foram selecionados pelo usuário)
+    final startingEquipment = selectionManager.startingEquipment;
+    if (startingEquipment.isNotEmpty) {
+      allEquipment.addAll(startingEquipment);
+      print('🎯 Ficha: Adicionando ${startingEquipment.length} equipamentos iniciais da classe: ${startingEquipment.map((e) => e.name).join(", ")}');
+    }
+    
+    _equipment = allEquipment;
+    
     // Aplica os atributos selecionados + bônus raciais
     _applyAttributesWithRacialBonus(selectedAttributes);
+    
+    // Calcula idiomas baseado nas seleções
+    _calculateLanguages();
+    
+    // Se há idiomas para escolher, mostra o diálogo após um pequeno delay
+    if (_languageResult != null && 
+        _languageResult!.additionalChoices > 0 && 
+        _selectedAdditionalLanguages.length < _languageResult!.additionalChoices) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Future.delayed(const Duration(milliseconds: 500), () {
+          if (mounted) {
+            _showLanguageSelectionDialog();
+          }
+        });
+      });
+    }
   });
 }
 
@@ -282,6 +447,20 @@ void _loadExistingCharacterData(CharacterModel character) {
     _gold = character.gold;
     _silver = character.silver;
     _copper = character.copper;
+    _equipment = character.equipment;
+    
+    // Carrega idiomas (para compatibilidade com versões antigas)
+    if (character.languages.isNotEmpty) {
+      // Personagem já tem idiomas salvos - separa automáticos dos escolhidos
+      final automaticLanguages = calculateAutomaticLanguages(_race, _characterClass, _background);
+      _selectedAdditionalLanguages = character.languages
+          .where((lang) => !automaticLanguages.contains(lang))
+          .toList();
+    } else {
+      // Personagem antigo sem idiomas - inicializa vazio
+      _selectedAdditionalLanguages = [];
+    }
+    _calculateLanguages();
   });
   
   print('🎯 Ficha: Personagem ${character.name} carregado com sucesso');
@@ -336,6 +515,9 @@ Future<void> _saveCharacter() async {
       gold: _gold,
       silver: _silver,
       copper: _copper,
+      languages: _knownLanguages,
+      equipment: _equipment,
+      startingEquipmentChoices: SelectionManager().startingEquipmentChoices, // Salva as escolhas de equipamentos iniciais feitas pelo usuário
       deathSaveSuccesses: _deathSaveSuccesses,
       deathSaveFailures: _deathSaveFailures,
       createdAt: _characterCreatedAt ?? DateTime.now(), // ✅ Usa data original se estiver editando
@@ -1317,7 +1499,7 @@ void _showSkillsDialog(BuildContext context
                           });
                           
                           // Salva as perícias selecionadas no SelectionManager
-                          SelectionManager.selectedSkills.value = result.skills;
+                          SelectionManager().setSelectedSkills(result.skills);
                           
                           Navigator.pop(ctx);
                         },
@@ -2134,6 +2316,94 @@ Widget _infoDisplay(String title, String value) {
     );
   }
 
+  // Método para exibir diálogo com detalhes dos equipamentos
+  void _showEquipmentDetailsDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF2C1810),
+          title: Text(
+            "Detalhes dos Equipamentos",
+            style: GoogleFonts.cinzel(
+              color: Colors.amber,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: _equipment.map((item) => Card(
+                  color: const Color(0xFF1A0F08),
+                  margin: const EdgeInsets.symmetric(vertical: 4),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                item.toString(),
+                                style: GoogleFonts.cinzel(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: Colors.amber.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                item.category,
+                                style: GoogleFonts.cinzel(
+                                  color: Colors.amber,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          item.description,
+                          style: GoogleFonts.cinzel(
+                            color: Colors.grey[300],
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )).toList(),
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(
+                "Fechar",
+                style: GoogleFonts.cinzel(
+                  color: Colors.amber,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final hasShieldProficiency = [
@@ -2914,6 +3184,70 @@ Widget _infoDisplay(String title, String value) {
                 ),
                 const SizedBox(height: 25),
 
+                // Equipamentos
+                _sectionTitle("Equipamentos"),
+                _card(
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (_equipment.isEmpty)
+                        Text(
+                          "Nenhum equipamento",
+                          style: GoogleFonts.cinzel(
+                            fontSize: 16,
+                            color: Colors.grey,
+                          ),
+                        )
+                      else
+                        ..._equipment.map((item) => Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4.0),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                flex: 3,
+                                child: Text(
+                                  item.toString(),
+                                  style: GoogleFonts.cinzel(
+                                    fontSize: 16,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                flex: 2,
+                                child: Text(
+                                  item.category,
+                                  style: GoogleFonts.cinzel(
+                                    fontSize: 14,
+                                    color: Colors.amber,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        )).toList(),
+                      if (_equipment.isNotEmpty) ...[
+                        const SizedBox(height: 10),
+                        const Divider(color: Colors.amber, thickness: 1),
+                        TextButton.icon(
+                          onPressed: () => _showEquipmentDetailsDialog(),
+                          icon: const Icon(Icons.info_outline, color: Colors.amber),
+                          label: Text(
+                            "Ver Detalhes",
+                            style: GoogleFonts.cinzel(
+                              color: Colors.amber,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 25),
+
                 // Características & Habilidades
                 _sectionTitle("Características & Habilidades"),
                 _card(
@@ -3079,15 +3413,106 @@ Widget _infoDisplay(String title, String value) {
                   Expanded(
                     child: Column(
                     children: [
-                      _sectionTitle("Idiomas"),
-                      _card(
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: raceClassData.raceLanguages[_race]
-                            ?.map((lang) => Text(lang))
-                            .toList() ??
-                          [const Text("Nenhum")],
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          _sectionTitle("Idiomas"),
+                          if (_languageResult != null && _languageResult!.additionalChoices > 0)
+                            IconButton(
+                              icon: Icon(
+                                Icons.edit,
+                                color: Colors.amber.shade700,
+                                size: 20,
+                              ),
+                              onPressed: _showLanguageSelectionDialog,
+                              tooltip: 'Escolher idiomas adicionais',
+                            ),
+                        ],
                       ),
+                      _card(
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (_knownLanguages.isNotEmpty) ...[
+                              // Idiomas automáticos
+                              if (_languageResult?.automaticLanguages.isNotEmpty == true) ...[
+                                Text(
+                                  "Automáticos:",
+                                  style: GoogleFonts.cinzel(
+                                    color: Colors.amber,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                ..._languageResult!.automaticLanguages.map(
+                                  (lang) => Padding(
+                                    padding: const EdgeInsets.only(left: 8, bottom: 2),
+                                    child: Text(
+                                      "• $lang",
+                                      style: GoogleFonts.cinzel(color: Colors.white, fontSize: 14),
+                                    ),
+                                  ),
+                                ),
+                                if (_selectedAdditionalLanguages.isNotEmpty) 
+                                  const SizedBox(height: 8),
+                              ],
+                              // Idiomas escolhidos
+                              if (_selectedAdditionalLanguages.isNotEmpty) ...[
+                                Text(
+                                  "Escolhidos:",
+                                  style: GoogleFonts.cinzel(
+                                    color: Colors.blue.shade300,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                ..._selectedAdditionalLanguages.map(
+                                  (lang) => Padding(
+                                    padding: const EdgeInsets.only(left: 8, bottom: 2),
+                                    child: Text(
+                                      "• $lang",
+                                      style: GoogleFonts.cinzel(color: Colors.blue.shade100, fontSize: 14),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                              // Indicador de idiomas disponíveis para escolha
+                              if (_languageResult != null && 
+                                  _selectedAdditionalLanguages.length < _languageResult!.additionalChoices) ...[
+                                const SizedBox(height: 8),
+                                Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.amber.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(4),
+                                    border: Border.all(color: Colors.amber.withOpacity(0.3)),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.info_outline,
+                                        color: Colors.amber,
+                                        size: 16,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Text(
+                                          "Você pode escolher ${_languageResult!.additionalChoices - _selectedAdditionalLanguages.length} idioma(s) adicional(is)",
+                                          style: GoogleFonts.cinzel(
+                                            color: Colors.amber,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ] else ...[
+                              const Text("Nenhum idioma conhecido"),
+                            ],
+                          ],
+                        ),
                       ),
                     ],
                     ),

@@ -159,8 +159,8 @@ class RaceDetailScreen extends StatelessWidget {
                         ),
                       ),
                       onPressed: () {
-                        // Salva a raça no ValueNotifier
-                        SelectionManager.selectedRace.value = race["name"];
+                        // Salva a raça no SelectionManager
+                        SelectionManager().selectedRace = race["name"];
                         Navigator.pop(context); // volta depois de selecionar
                       },
                       child: const Text("Selecionar"),

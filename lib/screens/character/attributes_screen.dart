@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:app_rpg/selection_manager.dart';
-import 'package:app_rpg/screens/ficha/summary_screen.dart';
+import 'package:app_rpg/screens/character/starting_equipment_screen.dart';
 
 // Constantes
 const double titleFontSize = 80.0;
@@ -216,9 +216,10 @@ class _AttributesScreenState extends State<AttributesScreen> {
   }
 
   void _checkForCustomRaceBonus(BuildContext context) {
-    final race = SelectionManager.selectedRace.value;
+    final selectionManager = SelectionManager();
+    final race = selectionManager.selectedRace;
     if (race == null) {
-      SelectionManager.selectedCustomBonus.value = {};
+      selectionManager.setSelectedCustomBonus({});
       return;
     }
 
@@ -257,7 +258,7 @@ class _AttributesScreenState extends State<AttributesScreen> {
           break;
       }
       // Limpa bônus customizados para raças sem escolha (importante!)
-      SelectionManager.selectedCustomBonus.value = {};
+      SelectionManager().setSelectedCustomBonus({});
       _mostrarSnackBar(context, mensagem, icone: Icons.check_circle, cor: Colors.green);
     }
   }
@@ -321,7 +322,7 @@ class _AttributesScreenState extends State<AttributesScreen> {
                   onPressed: selectedAttribute == null
                       ? null
                       : () {
-                          SelectionManager.selectedCustomBonus.value = {selectedAttribute!: 1};
+                          SelectionManager().setSelectedCustomBonus({selectedAttribute!: 1});
                           Navigator.of(dialogContext).pop();
                           _mostrarSnackBar(context, "Bônus de Gnomo (+1 $selectedAttribute) aplicado!", icone: Icons.check_circle, cor: Colors.green);
                         },
@@ -430,7 +431,7 @@ class _AttributesScreenState extends State<AttributesScreen> {
                   onPressed: selectedCount != 2
                       ? null
                       : () {
-                          SelectionManager.selectedCustomBonus.value = tempBonus;
+                          SelectionManager().setSelectedCustomBonus(tempBonus);
                           Navigator.of(dialogContext).pop();
                           final bonusList = tempBonus.keys.join(' e ');
                           _mostrarSnackBar(context, "Bônus de Meio-Elfo (+1 em $bonusList) aplicado!", icone: Icons.check_circle, cor: Colors.green);
@@ -594,13 +595,13 @@ class _AttributesScreenState extends State<AttributesScreen> {
                             "Você precisa distribuir todos os pontos (27) antes de continuar.",
                             icone: Icons.warning_amber_rounded, cor: Colors.orange);
                       } else {
-                        SelectionManager.selectedAttributes.value = atributos;
+                        SelectionManager().setSelectedAttributes(atributos);
                         // Verifica se os bônus customizados foram escolhidos antes de avançar, se necessário.
                         // Para o Gnomo e Meio-Elfo, o diálogo garante que a escolha foi feita antes de fechar.
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const SummaryScreen()),
+                              builder: (context) => const StartingEquipmentScreen()),
                         );
                       }
                     },

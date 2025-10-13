@@ -59,13 +59,3 @@ final List<AvatarData> predefinedAvatars = List.generate(
 AvatarData getDefaultAvatar(int index) {
   return predefinedAvatars[index % predefinedAvatars.length];
 }
-
-// Função para obter avatar por ID
-AvatarData? getAvatarById(String? id) {
-  if (id == null) return null;
-  try {
-    return predefinedAvatars.firstWhere((avatar) => avatar.id == id);
-  } catch (e) {
-    return null;
-  }
-}

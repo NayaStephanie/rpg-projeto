@@ -67,15 +67,17 @@ class _AboutScreenState extends State<AboutScreen> {
                         '''
 Seja bem-vindo, aventureiro!
 
-Este grimório digital nasceu nas terras da Faculdade de Tecnologia de Ribeirão Preto (Fatec), forjado na disciplina de Programação para Dispositivos Móveis.
+Sob o emblema da Fatec Ribeirão Preto, e guiados pelos desígnios da Programação para Dispositivos Móveis, dois aprendizes da arte tecnológica empreenderam a criação deste artefato digital.
 
-Nosso objetivo é oferecer uma ferramenta mágica para auxiliar heróis e mestres na criação e gestão de fichas de RPG, tornando a jornada mais prática, imersiva e envolvente.
+Seu propósito é singular: oferecer aos viajantes dos mundos imaginários uma ferramenta capaz de ordenar, preservar e dar forma às fichas que narram suas epopeias.
 
-Equipe de desenvolvimento:
+Assim, entre linhas de código e lampejos de inspiração, ergueu-se este aplicativo — simples em essência, mas nobre em intento.
+
+Obra dos artífices:
 • Nayara Stephanie S. Silva
 • Victor Peaguda Bekcivanyi
 
-Que este artefato seja útil em suas campanhas, e que os dados sempre rolem a seu favor!
+Que este legado sirva aos aventureiros como o pergaminho serve ao cronista: guardião fiel de suas histórias.
                         ''',
                         style: GoogleFonts.imFellEnglish(
                           fontSize: 26,

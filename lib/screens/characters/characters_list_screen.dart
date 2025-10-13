@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -6,6 +8,7 @@ import 'package:app_rpg/services/character_storage_service.dart';
 import 'package:app_rpg/services/subscription_service.dart';
 import 'package:app_rpg/screens/ficha_pronta/ficha_pronta.dart';
 import 'package:app_rpg/screens/settings/settings_screen.dart';
+import 'package:app_rpg/utils/app_localizations.dart';
 import 'dart:io';
 class CharactersListScreen extends StatefulWidget {
   const CharactersListScreen({super.key});
@@ -19,6 +22,10 @@ class _CharactersListScreenState extends State<CharactersListScreen> {
   bool _loading = true;
   bool _isPremium = false;
   int _characterLimit = 2;
+
+  String _getTranslatedText(String key) {
+    return AppLocalizations.of(context)?.translate(key) ?? key;
+  }
 
   @override
   void initState() {
@@ -87,14 +94,14 @@ class _CharactersListScreenState extends State<CharactersListScreen> {
             ),
             ),
           title: Text(
-            'Excluir Personagem',
+            _getTranslatedText('deleteCharacter'),
             style: GoogleFonts.jimNightshade(
               color: Colors.white,
               fontSize: 24,
             ),
           ),
           content: Text(
-            'Tem certeza que deseja excluir "${character.name}"?',
+            '${_getTranslatedText('confirmDeleteCharacter')} "${character.name}"?',
             style: GoogleFonts.imFellEnglish(
               color: Colors.white70,
               fontSize: 18,
@@ -104,7 +111,7 @@ class _CharactersListScreenState extends State<CharactersListScreen> {
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
               child: Text(
-                'Cancelar',
+                _getTranslatedText('cancel'),
                 style: GoogleFonts.cinzel(
                   color: Colors.white70,
                   fontSize: 16,
@@ -117,7 +124,7 @@ class _CharactersListScreenState extends State<CharactersListScreen> {
                 _deleteCharacter(character.id);
               },
               child: Text(
-                'Excluir',
+                _getTranslatedText('delete'),
                 style: GoogleFonts.cinzel(
                   color: Colors.red,
                   fontSize: 16,

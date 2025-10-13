@@ -1,3 +1,5 @@
+import 'equipment_item.dart';
+
 class CharacterModel {
   final String id;
   final String name;
@@ -20,6 +22,9 @@ class CharacterModel {
   final int gold;
   final int silver;
   final int copper;
+  final List<String> languages; // Idiomas conhecidos pelo personagem
+  final List<EquipmentItem> equipment; // Equipamentos/itens do personagem
+  final Map<int, String> startingEquipmentChoices; // Escolhas de equipamentos iniciais (índice -> "A" ou "B")
   final List<bool> deathSaveSuccesses;
   final List<bool> deathSaveFailures;
   final DateTime createdAt;
@@ -47,6 +52,9 @@ class CharacterModel {
     required this.gold,
     required this.silver,
     required this.copper,
+    required this.languages,
+    required this.equipment,
+    required this.startingEquipmentChoices,
     required this.deathSaveSuccesses,
     required this.deathSaveFailures,
     required this.createdAt,
@@ -77,6 +85,9 @@ class CharacterModel {
       'gold': gold,
       'silver': silver,
       'copper': copper,
+      'languages': languages,
+      'equipment': equipment.map((item) => item.toJson()).toList(),
+      'startingEquipmentChoices': startingEquipmentChoices.map((key, value) => MapEntry(key.toString(), value)),
       'deathSaveSuccesses': deathSaveSuccesses,
       'deathSaveFailures': deathSaveFailures,
       'createdAt': createdAt.toIso8601String(),
@@ -112,6 +123,16 @@ class CharacterModel {
       gold: json['gold'],
       silver: json['silver'],
       copper: json['copper'],
+      languages: json['languages'] != null 
+          ? List<String>.from(json['languages'])
+          : [], // Para compatibilidade com versões antigas
+      equipment: json['equipment'] != null
+          ? (json['equipment'] as List).map((item) => EquipmentItem.fromJson(item)).toList()
+          : [], // Para compatibilidade com versões antigas
+      startingEquipmentChoices: json['startingEquipmentChoices'] != null
+          ? (json['startingEquipmentChoices'] as Map<String, dynamic>)
+              .map((key, value) => MapEntry(int.parse(key), value as String))
+          : {}, // Para compatibilidade com versões antigas
       deathSaveSuccesses: List<bool>.from(json['deathSaveSuccesses']),
       deathSaveFailures: List<bool>.from(json['deathSaveFailures']),
       createdAt: DateTime.parse(json['createdAt']),
@@ -142,6 +163,9 @@ class CharacterModel {
     int? gold,
     int? silver,
     int? copper,
+    List<String>? languages,
+    List<EquipmentItem>? equipment,
+    Map<int, String>? startingEquipmentChoices,
     List<bool>? deathSaveSuccesses,
     List<bool>? deathSaveFailures,
     DateTime? createdAt,
@@ -169,6 +193,9 @@ class CharacterModel {
       gold: gold ?? this.gold,
       silver: silver ?? this.silver,
       copper: copper ?? this.copper,
+      languages: languages ?? this.languages,
+      equipment: equipment ?? this.equipment,
+      startingEquipmentChoices: startingEquipmentChoices ?? this.startingEquipmentChoices,
       deathSaveSuccesses: deathSaveSuccesses ?? this.deathSaveSuccesses,
       deathSaveFailures: deathSaveFailures ?? this.deathSaveFailures,
       createdAt: createdAt ?? this.createdAt,

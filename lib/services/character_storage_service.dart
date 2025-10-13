@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print, provide_deprecation_message
+
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:app_rpg/models/character_model.dart';

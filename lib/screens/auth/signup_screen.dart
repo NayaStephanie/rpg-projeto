@@ -1,9 +1,10 @@
-// ignore_for_file: deprecated_member_use
+// ignore_for_file: deprecated_member_use, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:app_rpg/services/subscription_service.dart';
 import 'package:app_rpg/screens/payment/payment_screen.dart';
+import '../../utils/app_localizations.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -21,6 +22,11 @@ class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController telefoneController = TextEditingController();
   final TextEditingController senhaController = TextEditingController();
   final TextEditingController confirmarSenhaController = TextEditingController();
+
+  String _getTranslatedText(String key) {
+    final localizations = AppLocalizations.of(context);
+    return localizations?.translate(key) ?? key;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +48,7 @@ class _SignupScreenState extends State<SignupScreen> {
               children: [
                 // Título
                 Text(
-                  "Criar Conta",
+                  _getTranslatedText('signup'),
                   style: GoogleFonts.jimNightshade(
                     fontSize: 60,
                     color: Colors.white,
@@ -51,23 +57,23 @@ class _SignupScreenState extends State<SignupScreen> {
                 const SizedBox(height: 40),
 
                 // Nome de usuário
-                _buildTextField("Nome de Usuário", controller: nomeController),
+                _buildTextField(_getTranslatedText("name"), controller: nomeController),
                 const SizedBox(height: 20),
 
                 // Email
-                _buildTextField("Email", controller: emailController),
+                _buildTextField(_getTranslatedText("email"), controller: emailController),
                 const SizedBox(height: 20),
 
                 // Número de telefone
-                _buildTextField("Número de telefone", controller: telefoneController),
+                _buildTextField(_getTranslatedText("phone"), controller: telefoneController),
                 const SizedBox(height: 20),
 
                 // Senha
-                _buildTextField("Senha", controller: senhaController, isPassword: true),
+                _buildTextField(_getTranslatedText("password"), controller: senhaController, isPassword: true),
                 const SizedBox(height: 20),
 
                 // Confirmar senha
-                _buildTextField("Confirmar Senha", controller: confirmarSenhaController, isPassword: true),
+                _buildTextField(_getTranslatedText("confirmPassword"), controller: confirmarSenhaController, isPassword: true),
                 const SizedBox(height: 30),
 
                 // Opções de armazenamento
@@ -85,7 +91,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                     Expanded(
                       child: Text(
-                        "Salvar localmente (grátis)",
+                        _getTranslatedText("saveLocally"),
                         style: GoogleFonts.imFellEnglish(
                           color: Colors.white,
                           fontSize: 20,
@@ -108,7 +114,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                     Expanded(
                       child: Text(
-                        "Salvar na nuvem (premium)",
+                        _getTranslatedText("saveInCloud"),
                         style: GoogleFonts.imFellEnglish(
                           color: Colors.white,
                           fontSize: 20,
@@ -135,7 +141,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   onPressed: () {
                     _validarCadastro(context);
                   },
-                  child: const Text("Cadastrar"),
+                  child: Text(_getTranslatedText("signup")),
                 ),
                 const SizedBox(height: 30),
 
@@ -145,7 +151,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     Navigator.pop(context);
                   },
                   child: Text(
-                    "Voltar",
+                    _getTranslatedText("back"),
                     style: GoogleFonts.imFellEnglish(
                       fontSize: 26,
                       color: Colors.white,

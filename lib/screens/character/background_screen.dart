@@ -154,8 +154,7 @@ class _BackgroundScreenState extends State<BackgroundScreen> {
                             Container(
                               decoration: BoxDecoration(
                                 border: Border.all(
-                                  color: SelectionManager.selectedBackground.value ==
-                                          bg["name"]
+                                  color: SelectionManager().selectedBackground == bg["name"]
                                       ? Colors.yellow
                                       : Colors.transparent,
                                   width: 3,
@@ -189,9 +188,11 @@ class _BackgroundScreenState extends State<BackgroundScreen> {
               // Botão Próximo
               Padding(
                 padding: const EdgeInsets.all(20),
-                child: ValueListenableBuilder<String?>(
-                  valueListenable: SelectionManager.selectedBackground,
-                  builder: (context, selected, _) {
+                child: AnimatedBuilder(
+                  animation: SelectionManager(),
+                  builder: (context, _) {
+                  final selectionManager = SelectionManager();
+                  final selected = selectionManager.selectedBackground;
                   final isSelected = selected != null;
                   return ElevatedButton(
                     style: ElevatedButton.styleFrom(

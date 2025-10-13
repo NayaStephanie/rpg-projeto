@@ -14,6 +14,7 @@ class AppRoutes {
   static const backgroundDetailScreen = '/backgroundDetailScreen';
   static const summaryScreen = '/summaryScreen';
   static const attributeScreen = '/attributeScreen';
+  static const startingEquipmentScreen = '/startingEquipmentScreen';
   static const characterSheet = '/characterSheet'; // Nova rota para a ficha final
   static const payment = '/payment'; // Nova rota para pagamento premium
 }

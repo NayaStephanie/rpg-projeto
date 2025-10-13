@@ -6,9 +6,15 @@ import 'package:app_rpg/screens/about/about_screen.dart';
 import 'package:app_rpg/screens/character/race_list_screen.dart';
 import 'package:app_rpg/screens/characters/characters_list_screen.dart';
 import 'package:app_rpg/screens/support/support_screen.dart';
+import '../../utils/app_localizations.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
+
+  String _getTranslatedText(BuildContext context, String key) {
+    final localizations = AppLocalizations.of(context);
+    return localizations?.translate(key) ?? key;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +50,7 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 70),
-                _buildMenuButton(context, "Personagens", () {
+                _buildMenuButton(context, _getTranslatedText(context, "characters"), () {
                   Navigator.push(
                     context,
                     PageRouteBuilder(
@@ -68,7 +74,7 @@ class HomeScreen extends StatelessWidget {
                   );
                 }),
                 const SizedBox(height: 50),
-                _buildMenuButton(context, "Criar", () {
+                _buildMenuButton(context, _getTranslatedText(context, "createCharacter"), () {
                  Navigator.push(
   context,
   PageRouteBuilder(
@@ -93,14 +99,14 @@ class HomeScreen extends StatelessWidget {
 
                 }),
                 const SizedBox(height: 50),
-                _buildMenuButton(context, "Suporte", () {
+                _buildMenuButton(context, _getTranslatedText(context, "support"), () {
                   Navigator.push(context, MaterialPageRoute(
                     builder: (context) => const SupportScreen(),
                   ));
                 }),
 
                 const SizedBox(height: 50),
-                _buildMenuButton(context, "Sobre o App", () {
+                _buildMenuButton(context, _getTranslatedText(context, "about"), () {
                   Navigator.push(context, MaterialPageRoute(
                     builder: (context) => const AboutScreen(),
                   ));

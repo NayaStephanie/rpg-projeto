@@ -127,8 +127,7 @@ class BackgroundDetailScreen extends StatelessWidget {
                         ),
                       ),
                       onPressed: () {
-                        SelectionManager.selectedBackground.value =
-                            background["name"];
+                        SelectionManager().selectedBackground = background["name"];
                         Navigator.pop(context);
                       },
                       child: const Text("Selecionar"),

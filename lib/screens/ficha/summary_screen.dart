@@ -54,8 +54,9 @@ int calcularMod(int valor) {
 
 // Função para calcular o valor FINAL com bônus raciais
 Map<String, int> _calcularAtributosFinais() {
-  final atributosBase = SelectionManager.selectedAttributes.value;
-  final race = SelectionManager.selectedRace.value;
+  final selectionManager = SelectionManager();
+  final atributosBase = selectionManager.selectedAttributes;
+  final race = selectionManager.selectedRace;
   
   // Usa a função do race_bonuses.dart para obter o total de bônus
   final bonusRacial = getRaceBonus(race);
@@ -134,19 +135,10 @@ void _mostrarSnackBar(BuildContext context, String mensagem,
   @override
   Widget build(BuildContext context) {
 	// Recupera seleções feitas
-	final race = SelectionManager.selectedRace.value;
-	final classe = SelectionManager.selectedClass.value;
-	final background = SelectionManager.selectedBackground.value;
-
-	// DEBUG: Log dos caminhos das imagens
-	print('=== DEBUG IMAGENS SUMMARY ===');
-	print('Raça: "$race" -> "${normalizeAssetName(race)}"');
-	print('Classe: "$classe" -> "${normalizeAssetName(classe)}"');  
-	print('Antecedente: "$background" -> "${normalizeAssetName(background)}"');
-	print('Caminho raça: "lib/assets/images/racas/${normalizeAssetName(race) ?? 'race'}.png"');
-	print('Caminho classe: "lib/assets/images/classes/${normalizeAssetName(classe) ?? 'class'}.png"');
-	print('Caminho antecedente: "lib/assets/images/antecedentes/${normalizeAssetName(background) ?? 'background'}.png"');
-	print('========================');
+	final selectionManager = SelectionManager();
+	final race = selectionManager.selectedRace;
+	final classe = selectionManager.selectedClass;
+	final background = selectionManager.selectedBackground;
 
 	// NOVO: Calcula os atributos FINAIS (base + bônus)
 	final atributosFinais = _calcularAtributosFinais();

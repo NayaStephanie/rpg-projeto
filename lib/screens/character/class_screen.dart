@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:app_rpg/screens/character/class_detail_screen.dart';
 import 'package:app_rpg/selection_manager.dart';
 import 'package:app_rpg/utils/app_routes.dart';
+import '../../utils/app_localizations.dart';
 
 // Constantes para padronizar
 const double titleFontSize = 80.0;
@@ -19,6 +20,12 @@ class ClassScreen extends StatefulWidget {
 }
 
 class _ClassScreenState extends State<ClassScreen> {
+  
+  String _getTranslatedText(String key) {
+    final localizations = AppLocalizations.of(context);
+    return localizations?.translate(key) ?? key;
+  }
+  
   // Função para exibir SnackBar customizado
   void _mostrarSnackBar(BuildContext context, String mensagem,
       {IconData? icone, Color cor = Colors.red}) {
@@ -91,7 +98,7 @@ class _ClassScreenState extends State<ClassScreen> {
 
               // Título
               Text(
-                "Classe",
+                _getTranslatedText("class"),
                 style: GoogleFonts.jimNightshade(
                   fontSize: titleFontSize,
                   color: Colors.white,
@@ -153,8 +160,7 @@ class _ClassScreenState extends State<ClassScreen> {
                             Container(
                               decoration: BoxDecoration(
                                 border: Border.all(
-                                  color: SelectionManager.selectedClass.value ==
-                                          classe["name"]
+                                  color: SelectionManager().selectedClass == classe["name"]
                                       ? Colors.yellow
                                       : Colors.transparent,
                                   width: 3,
@@ -188,9 +194,11 @@ class _ClassScreenState extends State<ClassScreen> {
               // Botão Próximo
               Padding(
                 padding: const EdgeInsets.all(20),
-                child: ValueListenableBuilder<String?>(
-                  valueListenable: SelectionManager.selectedClass,
-                  builder: (context, selectedClass, _) {
+                child: AnimatedBuilder(
+                  animation: SelectionManager(),
+                  builder: (context, _) {
+                    final selectionManager = SelectionManager();
+                    final selectedClass = selectionManager.selectedClass;
                     final isSelected = selectedClass != null;
                     return ElevatedButton(
                       style: ElevatedButton.styleFrom(

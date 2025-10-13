@@ -1,5 +1,8 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:app_rpg/utils/app_localizations.dart';
 
 class SupportScreen extends StatefulWidget {
   const SupportScreen({super.key});
@@ -14,6 +17,10 @@ class _SupportScreenState extends State<SupportScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _subjectController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+
+  String _getTranslatedText(String key) {
+    return AppLocalizations.of(context)?.translate(key) ?? key;
+  }
 
   @override
   void dispose() {
@@ -31,7 +38,7 @@ class _SupportScreenState extends State<SupportScreen> {
         _subjectController.text.trim().isEmpty ||
         _descriptionController.text.trim().isEmpty) {
       _showSnackBar(
-        "Por favor, preencha todos os campos obrigatórios.",
+        _getTranslatedText('fillAllFields'),
         Icons.warning_amber_rounded,
         Colors.orange,
       );
@@ -41,7 +48,7 @@ class _SupportScreenState extends State<SupportScreen> {
     // Validação de email básica
     if (!_emailController.text.contains('@')) {
       _showSnackBar(
-        "Por favor, insira um email válido.",
+        _getTranslatedText('validEmailPlease'),
         Icons.email_outlined,
         Colors.red,
       );
@@ -50,7 +57,7 @@ class _SupportScreenState extends State<SupportScreen> {
 
     // Simula envio do ticket
     _showSnackBar(
-      "Solicitação enviada com sucesso! Entraremos em contato em breve.",
+      _getTranslatedText('requestSentSuccess'),
       Icons.check_circle_outline,
       Colors.green,
     );
@@ -134,7 +141,7 @@ class _SupportScreenState extends State<SupportScreen> {
                   
                   // Título
                   Text(
-                    "Suporte",
+                    _getTranslatedText('support'),
                     style: GoogleFonts.jimNightshade(
                       fontSize: 60,
                       color: Colors.white,
@@ -150,7 +157,7 @@ class _SupportScreenState extends State<SupportScreen> {
                   const SizedBox(height: 10),
                   
                   Text(
-                    "Como podemos ajudar você?",
+                    _getTranslatedText('howCanWeHelp'),
                     style: GoogleFonts.cinzel(
                       fontSize: 18,
                       color: Colors.white70,
@@ -174,16 +181,16 @@ class _SupportScreenState extends State<SupportScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // Nome
-                        _buildLabel("Nome Completo *"),
+                        _buildLabel("${_getTranslatedText('fullName')} *"),
                         _buildTextField(
                           controller: _nameController,
-                          hintText: "Seu nome completo",
+                          hintText: _getTranslatedText('fullNameHint'),
                           icon: Icons.person_outline,
                         ),
                         const SizedBox(height: 20),
 
                         // Email
-                        _buildLabel("Email *"),
+                        _buildLabel("${_getTranslatedText('email')} *"),
                         _buildTextField(
                           controller: _emailController,
                           hintText: "seu.email@exemplo.com",
@@ -193,16 +200,16 @@ class _SupportScreenState extends State<SupportScreen> {
                         const SizedBox(height: 20),
 
                         // Assunto
-                        _buildLabel("Assunto *"),
+                        _buildLabel("${_getTranslatedText('subject')} *"),
                         _buildTextField(
                           controller: _subjectController,
-                          hintText: "Descreva brevemente o problema",
+                          hintText: _getTranslatedText('subjectHint'),
                           icon: Icons.subject_outlined,
                         ),
                         const SizedBox(height: 20),
 
                         // Descrição
-                        _buildLabel("Descrição Detalhada *"),
+                        _buildLabel("${_getTranslatedText('detailedDescription')} *"),
                         Container(
                           decoration: BoxDecoration(
                             color: Colors.black.withOpacity(0.3),
@@ -220,7 +227,7 @@ class _SupportScreenState extends State<SupportScreen> {
                               fontSize: 16,
                             ),
                             decoration: InputDecoration(
-                              hintText: "Descreva o problema em detalhes...",
+                              hintText: _getTranslatedText('descriptionHint'),
                               hintStyle: GoogleFonts.cinzel(
                                 color: Colors.white54,
                                 fontSize: 14,
@@ -247,7 +254,7 @@ class _SupportScreenState extends State<SupportScreen> {
                             onPressed: _submitSupport,
                             icon: const Icon(Icons.send_outlined),
                             label: Text(
-                              "Enviar Solicitação",
+                              _getTranslatedText('sendRequest'),
                               style: GoogleFonts.cinzel(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -274,7 +281,7 @@ class _SupportScreenState extends State<SupportScreen> {
                     child: Column(
                       children: [
                         Text(
-                          "Outras formas de contato",
+                          _getTranslatedText('otherContactMethods'),
                           style: GoogleFonts.cinzel(
                             color: Colors.amber,
                             fontSize: 18,
@@ -287,18 +294,18 @@ class _SupportScreenState extends State<SupportScreen> {
                           children: [
                             _buildContactInfo(
                               Icons.email_outlined,
-                              "Email",
+                              _getTranslatedText('email'),
                               "suporte@rpgapp.com",
                             ),
                             _buildContactInfo(
                               Icons.access_time_outlined,
-                              "Horário",
-                              "24h/7 dias",
+                              _getTranslatedText('schedule'),
+                              _getTranslatedText('twentyFourSeven'),
                             ),
                             _buildContactInfo(
                               Icons.schedule_outlined,
-                              "Resposta",
-                              "Até 24h",
+                              _getTranslatedText('response'),
+                              _getTranslatedText('upToTwentyFourHours'),
                             ),
                           ],
                         ),

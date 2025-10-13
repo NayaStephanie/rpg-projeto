@@ -146,8 +146,7 @@ class ClassDetailScreen extends StatelessWidget {
                         ),
                       ),
                       onPressed: () {
-                        SelectionManager.selectedClass.value =
-                            classData["name"];
+                        SelectionManager().selectedClass = classData["name"];
                         Navigator.pop(context);
                       },
                       child: const Text("Selecionar"),

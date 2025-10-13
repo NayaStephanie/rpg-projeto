@@ -51,13 +51,13 @@ Map<String, int> getRaceBonus(String? race) {
 
   final normalizedRace = _normalizeName(race);
   final fixedBonus = raceBonuses[normalizedRace] ?? {};
-  final customBonus = SelectionManager.selectedCustomBonus.value;
+  final customBonus = SelectionManager().selectedCustomBonus;
 
   // Combina o bônus fixo com o bônus customizado
   final Map<String, int> totalBonus = Map.from(fixedBonus);
   
   customBonus.forEach((attr, val) {
-    totalBonus[attr] = (totalBonus[attr] ?? 0) + val;
+    totalBonus[attr] = (totalBonus[attr] ?? 0) + val.toInt();
   });
   
   return totalBonus;

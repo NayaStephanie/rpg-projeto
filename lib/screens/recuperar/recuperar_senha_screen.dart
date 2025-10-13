@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../utils/app_localizations.dart';
 
 class RecuperarSenhaScreen extends StatefulWidget {
   const RecuperarSenhaScreen({super.key});
@@ -14,13 +15,18 @@ class _RecuperarSenhaScreenState extends State<RecuperarSenhaScreen> {
   final TextEditingController emailController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
+  String _getTranslatedText(String key) {
+    final localizations = AppLocalizations.of(context);
+    return localizations?.translate(key) ?? key;
+  }
+
   String? _validarEmail(String? value) {
     if (value == null || value.isEmpty) {
-      return "Informe seu email";
+      return _getTranslatedText("enterEmail");
     }
     final regex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
     if (!regex.hasMatch(value)) {
-      return "Digite um email válido";
+      return _getTranslatedText("validEmail");
     }
     return null;
   }
@@ -60,14 +66,14 @@ class _RecuperarSenhaScreenState extends State<RecuperarSenhaScreen> {
     if (_formKey.currentState!.validate()) {
       _mostrarSnackBar(
         context,
-        "Um link de recuperação foi enviado para ${emailController.text}",
+        "${_getTranslatedText("recoveryEmailSent")} ${emailController.text}",
         icone: Icons.email_outlined,
         cor: Colors.green,
       );
     } else {
       _mostrarSnackBar(
         context,
-        "Digite um email válido",
+        _getTranslatedText("enterValidEmail"),
         icone: Icons.warning_amber_rounded,
         cor: Colors.orange,
       );
@@ -96,7 +102,7 @@ class _RecuperarSenhaScreenState extends State<RecuperarSenhaScreen> {
                 children: [
                   // Título
                   Text(
-                    "Recuperar Senha",
+                    _getTranslatedText("recoverPassword"),
                     style: GoogleFonts.jimNightshade(
                       fontSize: 60,
                       color: Colors.white,
@@ -110,7 +116,7 @@ class _RecuperarSenhaScreenState extends State<RecuperarSenhaScreen> {
                     style: GoogleFonts.imFellEnglish(
                         color: Colors.white, fontSize: 18),
                     decoration: InputDecoration(
-                      hintText: "Informe o email de cadastro",
+                      hintText: _getTranslatedText("enterEmailRecover"),
                       hintStyle: const TextStyle(color: Colors.white70),
                       filled: true,
                       fillColor: Colors.black.withAlpha((0.20 * 255).toInt()),
@@ -140,7 +146,7 @@ class _RecuperarSenhaScreenState extends State<RecuperarSenhaScreen> {
                         ),
                       ),
                       onPressed: _enviar,
-                      child: const Text("Enviar"),
+                      child: Text(_getTranslatedText("sendRecoveryEmail")),
                     ),
                   ),
 
@@ -164,7 +170,7 @@ class _RecuperarSenhaScreenState extends State<RecuperarSenhaScreen> {
                       onPressed: () {
                         Navigator.pop(context);
                       },
-                      child: const Text("Voltar"),
+                      child: Text(_getTranslatedText("back")),
                     ),
                   ),
                 ],
