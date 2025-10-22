@@ -147,7 +147,7 @@ Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICE
   <tr>
     <td align="center">
       <a href="#">
-        <img src="https://github.com/nayara-stephanie.png" width="100px;" alt="Nayara Stephanie"/><br>
+        <img src="https://github.com/NayaStephanie" width="100px;" alt="Nayara Stephanie"/><br>
         <sub><b>Nayara Stephanie S. Silva</b></sub>
       </a>
     </td>
