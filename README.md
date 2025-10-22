@@ -153,7 +153,7 @@ Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICE
     </td>
     <td align="center">
       <a href="#">
-        <img src="https://github.com/victor-peaguda.png" width="100px;" alt="Victor Peaguda"/><br>
+        <img src="https://github.com/VictorBekcivanyi" width="100px;" alt="Victor Peaguda"/><br>
         <sub><b>Victor Peaguda Bekcivanyi</b></sub>
       </a>
     </td>
