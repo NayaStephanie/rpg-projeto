@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use, avoid_print
+// ignore_for_file: deprecated_member_use, avoid_print, use_build_context_synchronously
 
 import 'package:app_rpg/screens/home/home_screen.dart';
 import 'package:flutter/material.dart';
@@ -8,9 +8,12 @@ import '../recuperar/recuperar_senha_screen.dart';
 import 'signup_screen.dart';
 import '../../utils/app_localizations.dart';
 import '../../utils/language_manager.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../../services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  final bool showLogoutMessage;
+  const LoginScreen({super.key, this.showLogoutMessage = false});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -21,63 +24,61 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController senhaController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
-  // Mock de usuário fixo (simulação de autenticação)
-  final String _mockEmail = "teste@rpg.com";
-  final String _mockSenha = "1234";
-
- /* @override
-  void initState() {
-    super.initState();
-    // Pré-preenche o campo de e-mail com o mock para facilitar testes
-    emailController.text = _mockEmail;
-  }*/
 
   String _getTranslatedText(String key) {
     return AppLocalizations.of(context)?.translate(key) ?? key;
   }
 
-  void _login() {
-    if (_formKey.currentState!.validate()) {
-      final email = emailController.text.trim();
-      final senha = senhaController.text.trim();
+  Future<void> _login(BuildContext context) async {
+    if (!_formKey.currentState!.validate()) return;
 
-      if (email == _mockEmail && senha == _mockSenha) {
-        // Login bem-sucedido → vai para a home
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
-        );
-      } else {
-        // Mostra erro se email/senha não conferem
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              _getTranslatedText('emailOrPasswordIncorrect'),
-              style: GoogleFonts.imFellEnglish(color: Colors.white, fontSize: 18),
-            ),
-            backgroundColor: Colors.red.withOpacity(0.8),
-            behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    _showLoadingDialog();
+    try {
+      await AuthService.signIn(email: emailController.text.trim(), password: senhaController.text.trim());
+      if (!mounted) return;
+      Navigator.of(context).pop(); // fecha o loading
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Usuário autenticado com sucesso!',
+            style: GoogleFonts.imFellEnglish(color: Colors.white, fontSize: 18),
           ),
-        );
-      }
+          backgroundColor: Colors.green.withOpacity(0.9),
+        ),
+      );
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomeScreen()));
+    } on FirebaseAuthException catch (e) {
+      if (!mounted) return;
+      Navigator.of(context).pop();
+      // Mensagens seguras para o usuário
+      final safeMessage = (e.code == 'user-not-found' || e.code == 'wrong-password')
+          ? _getTranslatedText('emailOrPasswordIncorrect')
+          : 'Não foi possível efetuar o login. Verifique seus dados e tente novamente.';
+
+      // Log para debug (não exibir para o usuário)
+      print('FirebaseAuthException login: code=${e.code} message=${e.message}');
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(safeMessage, style: GoogleFonts.imFellEnglish(color: Colors.white, fontSize: 18)),
+          backgroundColor: Colors.red.withOpacity(0.85),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      Navigator.of(context).pop();
+      // Mensagem genérica para erros inesperados
+      print('Login error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Ocorreu um erro ao tentar entrar. Tente novamente mais tarde.', style: GoogleFonts.imFellEnglish(color: Colors.white, fontSize: 18)),
+          backgroundColor: Colors.red.withOpacity(0.85),
+        ),
+      );
     }
   }
 
-  String? _validarEmail(String? value) {
-    if (value == null || value.isEmpty) return _getTranslatedText('enterEmail');
-    final regex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
-    if (!regex.hasMatch(value)) return _getTranslatedText('validEmail');
-    return null;
-  }
-
-  String? _validarSenha(String? value) {
-    if (value == null || value.isEmpty) return _getTranslatedText('enterPassword');
-    if (value.length < 4) return _getTranslatedText('passwordTooShort');
-    return null;
-  }
-
+ 
   void _showLanguageDialog() {
     print('_showLanguageDialog chamado'); // Debug
     
@@ -176,8 +177,43 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  void _showLoadingDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );
+  }
+
+  String? _validarEmail(String? value) {
+    if (value == null || value.isEmpty) return _getTranslatedText('enterEmail');
+    final regex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+    if (!regex.hasMatch(value)) return _getTranslatedText('validEmail');
+    return null;
+  }
+
+  String? _validarSenha(String? value) {
+    if (value == null || value.isEmpty) return _getTranslatedText('enterPassword');
+    if (value.length < 4) return _getTranslatedText('passwordTooShort');
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Se vier da ação de logout, mostra uma mensagem breve
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (widget.showLogoutMessage) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Você saiu com sucesso',
+              style: GoogleFonts.imFellEnglish(color: Colors.white, fontSize: 18),
+            ),
+            backgroundColor: Colors.green.withOpacity(0.9),
+          ),
+        );
+      }
+    });
     return Scaffold(
       body: Stack(
         fit: StackFit.expand,
@@ -256,7 +292,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       textStyle: GoogleFonts.imFellEnglish(fontSize: 26),
                     ),
-                    onPressed: _login, // usa o mock
+                    onPressed: () => _login(context),
                     child: Text(_getTranslatedText('login')),
                   ),
                   const SizedBox(height: 45),

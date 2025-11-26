@@ -21,22 +21,32 @@ import 'screens/ficha/summary_screen.dart';
 import 'screens/character/attributes_screen.dart';
 import 'screens/character/starting_equipment_screen.dart';
 import 'package:app_rpg/screens/ficha_pronta/ficha_pronta.dart';
+import 'screens/api/dnd_monsters_list_screen.dart';
 
 // ignore: unused_import
 import 'package:get_it/get_it.dart';
+
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+
+
 
 // Chave global para acessar o MyApp
 final GlobalKey<MyAppState> myAppKey = GlobalKey<MyAppState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+  // Inicializa o Firebase
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   // Inicializa o gerenciador de linguagem
   await LanguageManager().initializeLanguage();
   
   runApp(
     DevicePreview(
-      enabled: true, // Mudar para true para ativar o Device Preview
+      enabled: false, // Mudar para true para ativar o Device Preview
       builder: (context) => ChangeNotifierProvider(
         create: (context) => LanguageManager(),
         child: MyApp(key: myAppKey),
@@ -90,6 +100,7 @@ class MyAppState extends State<MyApp> {
         AppRoutes.attributeScreen: (_) => const AttributesScreen(),
         AppRoutes.startingEquipmentScreen: (_) => const StartingEquipmentScreen(),
         AppRoutes.characterSheet: (_) => const CharacterSheet(), // Nova rota para a ficha final (sem personagem existente)
+        AppRoutes.dndMonsters: (_) => const DndMonstersListScreen(),
         
       },
     );

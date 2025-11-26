@@ -1,8 +1,31 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 
 class FirestoreService {
   static final FirebaseFirestore _db = FirebaseFirestore.instance;
+
+  // Converte valores comuns para um DateTime que o Firestore aceita como timestamp.
+  // Aceita `String` (ISO8601), `int` (mills since epoch) ou `DateTime`.
+  static DateTime? _coerceToDateTime(dynamic v) {
+    if (v == null) return null;
+    if (v is DateTime) return v;
+    if (v is String) {
+      try {
+        return DateTime.parse(v);
+      } catch (_) {
+        return null;
+      }
+    }
+    if (v is int) {
+      try {
+        return DateTime.fromMillisecondsSinceEpoch(v);
+      } catch (_) {
+        return null;
+      }
+    }
+    return null;
+  }
 
   /// Adiciona um personagem na subcoleção `characters` dentro do documento do usuário em `usuarios/{uid}/characters`.
   /// Campos (exemplo): name, race, charClass, level, hp, createdAt
@@ -122,6 +145,10 @@ class FirestoreService {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) throw FirebaseAuthException(code: 'NO_USER', message: 'Usuário não autenticado');
 
+    // tenta converter createdAt para DateTime (caso venha como ISO string do modelo)
+    final createdAtVal = _coerceToDateTime(rawData['createdAt']);
+    final lastModifiedVal = _coerceToDateTime(rawData['lastModified']);
+
     final data = {
       'name': rawData['name'],
       'nameLower': (rawData['name'] as String?)?.toLowerCase(),
@@ -130,7 +157,9 @@ class FirestoreService {
       'level': rawData['level'],
       'hp': rawData['hitPoints'] ?? rawData['hp'],
       // Preserve any provided createdAt (from the model) otherwise set server timestamp
-      'createdAt': rawData['createdAt'] ?? FieldValue.serverTimestamp(),
+      'createdAt': createdAtVal ?? FieldValue.serverTimestamp(),
+      // também tenta preservar lastModified quando possível
+      'lastModified': lastModifiedVal ?? FieldValue.serverTimestamp(),
       'raw': rawData,
       'updatedAt': FieldValue.serverTimestamp(),
     };
@@ -207,5 +236,107 @@ class FirestoreService {
     if (user == null) throw FirebaseAuthException(code: 'NO_USER', message: 'Usuário não autenticado');
 
     await _db.collection('usuarios').doc(user.uid).collection('settings').doc('prefs').set(settings, SetOptions(merge: true));
+  }
+
+  /// Adiciona uma quest (tarefa/missão) na subcoleção `quests` do usuário.
+  /// Campos: title, description, difficulty, isCompleted, reward, createdAt
+  static Future<String> addQuest({
+    required String title,
+    required String description,
+    required int levelRequirement,
+    required String status, // 'active' | 'completed' | 'failed'
+    required Map<String, dynamic> reward, // { 'gold': int, 'items': List<String> }
+    String? location,
+  }) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) throw FirebaseAuthException(code: 'NO_USER', message: 'Usuário não autenticado');
+
+    final data = {
+      'title': title,
+      'titleLower': title.toLowerCase(),
+      'description': description,
+      'levelRequirement': levelRequirement,
+      'status': status,
+      'reward': reward,
+      'location': location ?? '',
+      'createdAt': FieldValue.serverTimestamp(),
+      'ownerId': user.uid,
+    };
+    // grava como subcoleção dentro do documento do usuário
+    try {
+      final docRef = await _db.collection('usuarios').doc(user.uid).collection('quests').add(data);
+      // Mantemos o registro de atividade no histórico do usuário
+      await addActivityLog(type: 'create_quest', targetId: docRef.id, description: 'Criou missão $title', metadata: {'levelRequirement': levelRequirement, 'status': status});
+      return docRef.id;
+    } catch (e, st) {
+      // log para ajudar no diagnóstico em cliente
+      debugPrint('FirestoreService.addQuest error: $e');
+      debugPrint('$st');
+      rethrow;
+    }
+  }
+
+  /// Adiciona uma entrada de diário/journal na subcoleção `journals`.
+  /// Campos: title, body, mood, tags (lista), createdAt
+  static Future<String> addJournalEntry({
+    required String title,
+    required String body,
+    required String mood,
+    required List<String> tags,
+  }) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) throw FirebaseAuthException(code: 'NO_USER', message: 'Usuário não autenticado');
+
+    final data = {
+      'title': title,
+      'titleLower': title.toLowerCase(),
+      'body': body,
+      'mood': mood,
+      'tags': tags,
+      'createdAt': FieldValue.serverTimestamp(),
+      'ownerId': user.uid,
+    };
+    try {
+      final docRef = await _db.collection('usuarios').doc(user.uid).collection('journals').add(data);
+      await addActivityLog(type: 'create_journal', targetId: docRef.id, description: 'Criou entrada de diário $title', metadata: {'tags': tags});
+      return docRef.id;
+    } catch (e, st) {
+      debugPrint('FirestoreService.addJournalEntry error: $e');
+      debugPrint('$st');
+      rethrow;
+    }
+  }
+
+  /// Adiciona uma conquista/achievement na subcoleção `achievements`.
+  /// Campos: name, description, points, achieved (bool), metadata
+  static Future<String> addAchievement({
+    required String name,
+    required String description,
+    required int points,
+    required bool achieved,
+    Map<String, dynamic>? metadata,
+  }) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) throw FirebaseAuthException(code: 'NO_USER', message: 'Usuário não autenticado');
+
+    final data = {
+      'name': name,
+      'nameLower': name.toLowerCase(),
+      'description': description,
+      'points': points,
+      'achieved': achieved,
+      'metadata': metadata ?? {},
+      'createdAt': FieldValue.serverTimestamp(),
+      'ownerId': user.uid,
+    };
+    try {
+      final docRef = await _db.collection('usuarios').doc(user.uid).collection('achievements').add(data);
+      await addActivityLog(type: 'create_achievement', targetId: docRef.id, description: 'Criou achievement $name', metadata: {'points': points});
+      return docRef.id;
+    } catch (e, st) {
+      debugPrint('FirestoreService.addAchievement error: $e');
+      debugPrint('$st');
+      rethrow;
+    }
   }
 }

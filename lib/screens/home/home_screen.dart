@@ -1,11 +1,17 @@
-// ignore_for_file: deprecated_member_use
+// ignore_for_file: deprecated_member_use, use_build_context_synchronously, unnecessary_import
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:app_rpg/screens/about/about_screen.dart';
 import 'package:app_rpg/screens/character/race_list_screen.dart';
 import 'package:app_rpg/screens/characters/characters_list_screen.dart';
+// imports removidos para simplificar a Home pública (apenas botões essenciais)
 import 'package:app_rpg/screens/support/support_screen.dart';
+import 'package:app_rpg/screens/auth/login_screen.dart';
+import 'package:app_rpg/screens/dev/manage_collections_screen.dart';
+import '../../utils/app_routes.dart';
+import '../../services/auth_service.dart';
+import 'package:flutter/foundation.dart';
 import '../../utils/app_localizations.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -16,9 +22,71 @@ class HomeScreen extends StatelessWidget {
     return localizations?.translate(key) ?? key;
   }
 
+  void _showLogoutConfirmation(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: Colors.black.withOpacity(0.9),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+          side: const BorderSide(color: Colors.amber, width: 2),
+        ),
+        title: Text(
+          _getTranslatedText(context, 'logout') ,
+          style: GoogleFonts.imFellEnglish(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+        ),
+        content: Text(
+          _getTranslatedText(context, 'confirmLogout'),
+          style: GoogleFonts.imFellEnglish(color: Colors.white, fontSize: 18),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+            },
+            child: Text(
+              _getTranslatedText(context, 'cancel'),
+              style: GoogleFonts.imFellEnglish(color: Colors.white, fontSize: 16),
+            ),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.of(dialogContext).pop();
+              // mostra loading
+              showDialog(context: context, barrierDismissible: false, builder: (_) => const Center(child: CircularProgressIndicator()));
+              try {
+                await AuthService.signOut();
+              } catch (e) {
+                // ignora - exibiremos mensagem abaixo
+              }
+              Navigator.of(context, rootNavigator: true).pop();
+              // redireciona com flag para mostrar mensagem de logout
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LoginScreen(showLogoutMessage: true)));
+            },
+            child: Text(
+              _getTranslatedText(context, 'confirm'),
+              style: GoogleFonts.imFellEnglish(color: Colors.amber, fontSize: 16),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () => _showLogoutConfirmation(context),
+          )
+        ],
+      ),
+      extendBodyBehindAppBar: true,
       body: Stack(
         fit: StackFit.expand,
         children: [
@@ -38,80 +106,49 @@ class HomeScreen extends StatelessWidget {
 
           // Conteúdo
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 80),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Text(
-                  "RPGo!",
-                  style: GoogleFonts.jimNightshade(
-                    fontSize: 80,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(height: 70),
-                _buildMenuButton(context, _getTranslatedText(context, "characters"), () {
-                  Navigator.push(
-                    context,
-                    PageRouteBuilder(
-                      transitionDuration: const Duration(milliseconds: 700),
-                      pageBuilder: (context, animation, secondaryAnimation) => const CharactersListScreen(),
-                      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                        const begin = Offset(1.0, 0.0);
-                        const end = Offset.zero;
-                        final tween = Tween(begin: begin, end: end);
-                        final curvedAnimation = CurvedAnimation(
-                          parent: animation,
-                          curve: Curves.easeInOut,
-                        );
-
-                        return SlideTransition(
-                          position: tween.animate(curvedAnimation),
-                          child: child,
-                        );
-                      },
+            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 40),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text(
+                    "RPGo!",
+                    style: GoogleFonts.jimNightshade(
+                      fontSize: 72,
+                      color: Colors.white,
                     ),
-                  );
-                }),
-                const SizedBox(height: 50),
-                _buildMenuButton(context, _getTranslatedText(context, "createCharacter"), () {
-                 Navigator.push(
-  context,
-  PageRouteBuilder(
-    transitionDuration: const Duration(milliseconds: 700), // tempo da animação
-    pageBuilder: (context, animation, secondaryAnimation) => const RaceScreen(),
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      const begin = Offset(1.0, 0.0); // começa fora da tela, à direita
-      const end = Offset.zero;       // termina no centro (posição final)
-      final tween = Tween(begin: begin, end: end);
-      final curvedAnimation = CurvedAnimation(
-        parent: animation,
-        curve: Curves.easeInOut,     // suavidade
-      );
-
-      return SlideTransition(
-        position: tween.animate(curvedAnimation),
-        child: child,
-      );
-    },
-  ),
-);
-
-                }),
-                const SizedBox(height: 50),
-                _buildMenuButton(context, _getTranslatedText(context, "support"), () {
-                  Navigator.push(context, MaterialPageRoute(
-                    builder: (context) => const SupportScreen(),
-                  ));
-                }),
-
-                const SizedBox(height: 50),
-                _buildMenuButton(context, _getTranslatedText(context, "about"), () {
-                  Navigator.push(context, MaterialPageRoute(
-                    builder: (context) => const AboutScreen(),
-                  ));
-                }),
-              ],
+                  ),
+                  const SizedBox(height: 40),
+                  // Apenas os botões essenciais: Personagens, Criar, Suporte, Sobre
+                  _buildMenuButton(context, _getTranslatedText(context, "characters"), () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => const CharactersListScreen()));
+                  }),
+                  const SizedBox(height: 32),
+                  _buildMenuButton(context, _getTranslatedText(context, "createCharacter"), () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => const RaceScreen()));
+                  }),
+                  const SizedBox(height: 32),
+                  _buildMenuButton(context, _getTranslatedText(context, "support"), () {
+                    Navigator.push(context, MaterialPageRoute(
+                      builder: (context) => const SupportScreen(),
+                    ));
+                  }),
+                  const SizedBox(height: 32),
+                  _buildMenuButton(context, _getTranslatedText(context, "about"), () {
+                    Navigator.push(context, MaterialPageRoute(
+                      builder: (context) => const AboutScreen(),
+                    ));
+                  }),
+                  const SizedBox(height: 32),
+                  _buildMenuButton(context, 'Monstros', () {
+                    Navigator.pushNamed(context, AppRoutes.dndMonsters);
+                  }),
+                  const SizedBox(height: 32),
+                  _buildMenuButton(context, 'Extras', () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => const ManageCollectionsScreen()));
+                  }),
+                ],
+              ),
             ),
           ),
         ],

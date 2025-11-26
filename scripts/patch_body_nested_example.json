@@ -1,0 +1,15 @@
+{
+  "fields": {
+    "name": { "stringValue": "Nome Com Atributos" },
+    "nameLower": { "stringValue": "nome com atributos" },
+    "attributes": {
+      "mapValue": {
+        "fields": {
+          "STR": { "integerValue": "18" },
+          "DEX": { "integerValue": "14" },
+          "CON": { "integerValue": "12" }
+        }
+      }
+    }
+  }
+}

@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use, library_prefixes, unnecessary_to_list_in_spreads, prefer_final_fields, avoid_print, use_build_context_synchronously, unnecessary_import, sort_child_properties_last
+// ignore_for_file: deprecated_member_use, library_prefixes, unnecessary_to_list_in_spreads, prefer_final_fields, avoid_print, use_build_context_synchronously, unnecessary_import, sort_child_properties_last, curly_braces_in_flow_control_structures
 
 import 'package:flutter/material.dart';
 import 'dart:math';
@@ -21,18 +21,22 @@ import 'package:app_rpg/data/languages_data.dart';
 import 'package:app_rpg/selection_manager.dart';
 import 'package:app_rpg/race_bonuses.dart';
 import 'package:app_rpg/models/character_model.dart';
-import 'package:app_rpg/services/character_storage_service.dart';
+// local character storage removed: saving now targets only Firestore
 import 'package:app_rpg/services/subscription_service.dart';
 import 'package:app_rpg/utils/app_routes.dart';
 import 'package:app_rpg/services/avatar_storage_service.dart';
+import 'package:app_rpg/services/firestore_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart' as fs;
 
 
 class CharacterSheet extends StatefulWidget {
   final CharacterModel? existingCharacter;
-  
+  final String? firestoreDocId;
+
   const CharacterSheet({
     super.key,
     this.existingCharacter,
+    this.firestoreDocId,
   });
 
   @override
@@ -49,6 +53,10 @@ class _CharacterSheetState extends State<CharacterSheet> {
   // ID do personagem (para distinguir entre criação e edição)
   String? _characterId;
   DateTime? _characterCreatedAt;
+  // Sincronização com Firestore
+  bool _syncInProgress = false;
+  String? _syncStatusMessage;
+  DateTime? _lastSyncedAt;
   
   int _level = 1;
   String _race = "Humano";
@@ -276,9 +284,15 @@ void initState() {
   super.initState();
 
   // Verifica se há um personagem existente para carregar
-  if (widget.existingCharacter != null) {
+    if (widget.existingCharacter != null) {
     print('🎯 Ficha: Carregando personagem existente: ${widget.existingCharacter!.name}');
     _loadExistingCharacterData(widget.existingCharacter!);
+    } else if (widget.firestoreDocId != null) {
+      // Carrega do Firestore se foi passado um docId
+      print('🎯 Ficha: Carregando personagem do Firestore: ${widget.firestoreDocId}');
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _loadFromFirestore(widget.firestoreDocId!);
+      });
   } else {
     print('🎯 Ficha: Criando novo personagem');
     // PEGA OS DADOS DO SELECTIONMANAGER
@@ -466,6 +480,106 @@ void _loadExistingCharacterData(CharacterModel character) {
   print('🎯 Ficha: Personagem ${character.name} carregado com sucesso');
 }
 
+// Carrega dados do Firestore (docId) - método de instância dentro do State
+Future<void> _loadFromFirestore(String docId) async {
+  try {
+    final data = await FirestoreService.getCharacter(docId);
+    if (data == null) {
+      print('🎯 Ficha: Documento $docId não encontrado no Firestore');
+      _showSnackBar('Documento não encontrado na nuvem', isError: true);
+      return;
+    }
+
+    // Se existir campo `raw`, preferimos reconstruir o modelo a partir dele
+    final raw = data['raw'] as Map<String, dynamic>?;
+    CharacterModel character;
+    if (raw != null) {
+      // Caso seja um raw salvo anteriormente (local -> cloud)
+      try {
+        character = CharacterModel.fromJson(raw);
+        // garantir que id reflita o docId
+        character = character.copyWith(id: docId);
+      } catch (e) {
+        print('⚠️ Erro ao parsear raw do Firestore: $e');
+        // fallback para construir modelo manualmente
+        character = _buildCharacterFromDoc(data, docId);
+      }
+    } else {
+      character = _buildCharacterFromDoc(data, docId);
+    }
+
+    // Carrega na UI
+    _loadExistingCharacterData(character);
+  } catch (e) {
+    print('⚠️ Erro ao carregar do Firestore: $e');
+    _showSnackBar('Erro ao carregar personagem da nuvem: $e', isError: true);
+  }
+}
+
+// Constrói um CharacterModel com valores seguros a partir dos campos do documento
+CharacterModel _buildCharacterFromDoc(Map<String, dynamic> data, String docId) {
+  // createdAt / updatedAt podem vir como Timestamp do Firestore
+  DateTime createdAt = DateTime.now();
+  DateTime lastModified = DateTime.now();
+  final created = data['createdAt'] ?? data['created_at'];
+  final updated = data['updatedAt'] ?? data['lastModified'] ?? data['updated_at'];
+  if (created is fs.Timestamp) createdAt = created.toDate();
+  else if (created is String) createdAt = DateTime.tryParse(created) ?? DateTime.now();
+  if (updated is fs.Timestamp) lastModified = updated.toDate();
+  else if (updated is String) lastModified = DateTime.tryParse(updated) ?? createdAt;
+
+  // atributos e perícias podem não existir em documentos criados via UI simplificada
+  Map<String, int> attributes = {
+    'FOR': 10,
+    'DES': 10,
+    'CON': 10,
+    'INT': 10,
+    'SAB': 10,
+    'CAR': 10,
+  };
+
+  Map<String, bool> skills = {};
+  try {
+    if (data['raw'] != null && data['raw'] is Map && (data['raw'] as Map).containsKey('skills')) {
+      skills = Map<String, bool>.from((data['raw'] as Map)['skills']);
+    }
+  } catch (_) {}
+
+  final hitPoints = data['hp'] ?? data['hitPoints'] ?? 0;
+  final armorClass = data['armorClass'] ?? data['armor_class'] ?? 10;
+
+  return CharacterModel(
+    id: docId,
+    name: data['name'] ?? '',
+    avatarPath: data['raw'] != null ? (data['raw'] as Map)['avatarPath'] as String? : null,
+    race: data['race'] ?? '',
+    characterClass: data['class'] ?? data['characterClass'] ?? '',
+    background: data['raw'] != null ? (data['raw'] as Map)['background'] as String? ?? '' : '',
+    level: data['level'] ?? 1,
+    attributes: attributes,
+    hitPoints: hitPoints,
+    armorClass: armorClass,
+    currentArmor: data['raw'] != null ? (data['raw'] as Map)['currentArmor'] as String? ?? '' : '',
+    hasShield: data['raw'] != null ? (data['raw'] as Map)['hasShield'] as bool? ?? false : false,
+    skills: skills,
+    preparedSpells: {},
+    selectedCantrips: {},
+    maxSpellSlots: {},
+    usedSpellSlots: {},
+    inspiration: data['raw'] != null ? (data['raw'] as Map)['inspiration'] as int? ?? 0 : 0,
+    gold: data['raw'] != null ? (data['raw'] as Map)['gold'] as int? ?? 0 : 0,
+    silver: data['raw'] != null ? (data['raw'] as Map)['silver'] as int? ?? 0 : 0,
+    copper: data['raw'] != null ? (data['raw'] as Map)['copper'] as int? ?? 0 : 0,
+    languages: data['raw'] != null ? List<String>.from((data['raw'] as Map)['languages'] ?? []) : [],
+    equipment: data['raw'] != null ? ( (data['raw'] as Map)['equipment'] ?? [] ).map<EquipmentItem>((e) => EquipmentItem.fromJson(e)).toList() : [],
+    startingEquipmentChoices: {},
+    deathSaveSuccesses: [false, false, false],
+    deathSaveFailures: [false, false, false],
+    createdAt: createdAt,
+    lastModified: lastModified,
+  );
+}
+
 // MÉTODO: Salva o personagem atual
 Future<void> _saveCharacter() async {
   final name = _nameController.text.trim();
@@ -524,15 +638,18 @@ Future<void> _saveCharacter() async {
       lastModified: DateTime.now(),
     );
 
-    // Salva o personagem
-    final saveResult = await CharacterStorageService.saveCharacter(character);
-    
-    if (saveResult.success) {
-      _showSnackBar('Personagem salvo com sucesso!', isError: false);
-    } else if (saveResult.requiresUpgrade) {
-      _showUpgradeDialog(saveResult.errorMessage ?? 'Limite de personagens atingido');
-    } else {
-      _showSnackBar(saveResult.errorMessage ?? 'Erro ao salvar personagem', isError: true);
+    // Salva o personagem diretamente na nuvem (Firestore). Não salvamos localmente.
+    try {
+      await FirestoreService.saveFullCharacter(character.toJson(), docId: character.id);
+      _showSnackBar('Personagem salvo na nuvem com sucesso!', isError: false);
+      setState(() {
+        _lastSyncedAt = DateTime.now();
+        _syncStatusMessage = 'Sincronizado em ${_lastSyncedAt!.toLocal().toString().split('.').first}';
+      });
+    } catch (e) {
+      // Em caso de falha, informamos ao usuário e não gravamos localmente por design.
+      _showSnackBar('Falha ao salvar personagem na nuvem: $e', isError: true);
+      if (kDebugMode) print('Falha ao salvar na nuvem: $e');
     }
   } catch (e) {
     _showSnackBar('Erro inesperado ao salvar: $e', isError: true);
@@ -550,7 +667,39 @@ void _showSnackBar(String message, {required bool isError}) {
   );
 }
 
+  // Sincroniza o personagem com o Firestore, atualiza estado e mostra feedback
+  Future<void> _syncToCloud(CharacterModel character) async {
+    setState(() {
+      _syncInProgress = true;
+      _syncStatusMessage = 'Sincronizando com a nuvem...';
+    });
+
+    // notifica usuário que a sincronização começou (discreta)
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Sincronizando com a nuvem...')));
+
+    try {
+      await FirestoreService.saveFullCharacter(character.toJson(), docId: character.id);
+      setState(() {
+        _syncInProgress = false;
+        _lastSyncedAt = DateTime.now();
+        _syncStatusMessage = 'Sincronizado em ${_lastSyncedAt!.toLocal().toString().split('.').first}';
+      });
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Sincronizado com sucesso')));
+    } catch (e) {
+      setState(() {
+        _syncInProgress = false;
+        _syncStatusMessage = 'Falha ao sincronizar: $e';
+      });
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Falha ao sincronizar: $e'),
+        action: SnackBarAction(label: 'Tentar novamente', onPressed: () => _syncToCloud(character)),
+      ));
+      print('⚠️ Falha ao salvar na nuvem: $e');
+    }
+  }
+
 // MÉTODO: Exibe dialog de upgrade para premium
+// ignore: unused_element
 void _showUpgradeDialog(String message) {
   showDialog(
     context: context,
@@ -2440,6 +2589,73 @@ Widget _infoDisplay(String title, String value) {
                   ],
                 ),
                 const SizedBox(height: 8),
+                // Indicador de sincronização (quando aplicável)
+                if (_syncInProgress || _syncStatusMessage != null)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    margin: const EdgeInsets.only(bottom: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.5),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.amber.shade700),
+                    ),
+                    child: Row(
+                      children: [
+                        if (_syncInProgress) const SizedBox(width: 6, height: 6, child: CircularProgressIndicator(strokeWidth: 2))
+                        else const Icon(Icons.cloud_done, color: Colors.amber, size: 18),
+                        const SizedBox(width: 10),
+                        Expanded(child: Text(_syncStatusMessage ?? '', style: GoogleFonts.imFellEnglish(color: Colors.white70, fontSize: 14))),
+                        if (!_syncInProgress && _syncStatusMessage != null)
+                          TextButton(
+                            onPressed: () {
+                              // caso tenha falhado, permitir tentar novamente
+                              if (_characterId != null) {
+                                // reconstruir modelo mínimo para retry
+                                final retryModel = CharacterModel(
+                                  id: _characterId!,
+                                  name: _nameController.text.trim(),
+                                  avatarPath: _avatarPath,
+                                  race: _race,
+                                  characterClass: _characterClass,
+                                  background: _background,
+                                  level: _level,
+                                  attributes: {
+                                    'FOR': _str,
+                                    'DES': _dex,
+                                    'CON': _con,
+                                    'INT': _int,
+                                    'SAB': _wis,
+                                    'CAR': _cha,
+                                  },
+                                  hitPoints: pv,
+                                  armorClass: ca,
+                                  currentArmor: _currentArmor.name,
+                                  hasShield: _hasShield,
+                                  skills: {},
+                                  preparedSpells: {},
+                                  selectedCantrips: {},
+                                  maxSpellSlots: {},
+                                  usedSpellSlots: {},
+                                  inspiration: _inspiracao,
+                                  gold: _gold,
+                                  silver: _silver,
+                                  copper: _copper,
+                                  languages: _knownLanguages,
+                                  equipment: _equipment,
+                                  startingEquipmentChoices: {},
+                                  deathSaveSuccesses: [false, false, false],
+                                  deathSaveFailures: [false, false, false],
+                                  createdAt: _characterCreatedAt ?? DateTime.now(),
+                                  lastModified: DateTime.now(),
+                                );
+                                _syncToCloud(retryModel);
+                              }
+                            },
+                            child: const Text('Tentar novamente'),
+                          ),
+                      ],
+                    ),
+                  ),
                 // Avatar e Nome
                 Row(
                   children: [
@@ -3644,3 +3860,4 @@ class HexagonPainter extends CustomPainter {
   @override
   bool shouldRepaint(CustomPainter oldDelegate) => false;
 }
+

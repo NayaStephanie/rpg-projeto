@@ -1,4 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:app_rpg/services/firestore_service.dart';
 
 class SubscriptionService {
   static const String _premiumKey = 'is_premium_user';
@@ -7,26 +9,59 @@ class SubscriptionService {
 
   // Verifica se o usuário é premium
   static Future<bool> isPremiumUser() async {
+    final user = FirebaseAuth.instance.currentUser;
+    // Temporariamente: tratar qualquer usuário autenticado como premium
+    // para forçar uso da nuvem conforme solicitado.
+    if (user != null) return true;
+
+    // Fallback para SharedPreferences quando não autenticado
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(_premiumKey) ?? false;
+    final val = prefs.getBool(_premiumKey);
+    if (val != null) return val;
+    final alt = prefs.getBool('flutter.$_premiumKey');
+    return alt ?? false;
   }
 
   // Define o status premium do usuário
   static Future<void> setPremiumStatus(bool isPremium) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_premiumKey, isPremium);
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      try {
+        await FirestoreService.setUserSettings({'is_premium_user': isPremium});
+      } catch (_) {
+        // Não falhar se Firestore indisponível
+      }
+    }
   }
 
   // Obtém o tipo de armazenamento (local ou cloud)
   static Future<String> getStorageType() async {
+    final user = FirebaseAuth.instance.currentUser;
+    // Temporariamente forçar 'cloud' quando autenticado
+    if (user != null) return 'cloud';
+
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_storageTypeKey) ?? 'local';
+    final v = prefs.getString(_storageTypeKey);
+    if (v != null && v.isNotEmpty) return v;
+    final alt = prefs.getString('flutter.$_storageTypeKey');
+    if (alt != null && alt.isNotEmpty) return alt;
+    return 'local';
   }
 
   // Define o tipo de armazenamento
   static Future<void> setStorageType(String storageType) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_storageTypeKey, storageType);
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      try {
+        await FirestoreService.setUserSettings({'storage_type': storageType});
+      } catch (_) {
+        // Não bloquear se Firestore falhar
+      }
+    }
   }
 
   // Verifica se pode criar mais personagens

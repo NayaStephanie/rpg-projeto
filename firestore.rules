@@ -1,0 +1,150 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // Validation helpers
+    function validateCharacter(data) {
+      return (data.name is string)
+             && data.name.size() > 0
+             && data.name.size() <= 200
+             && (!('level' in data) || (data.level is int && data.level >= 1 && data.level <= 20))
+             && (!('hitPoints' in data) || (data.hitPoints is int && data.hitPoints >= 0 && data.hitPoints <= 1000))
+             && (!('createdAt' in data) || data.createdAt is timestamp)
+             && (!('updatedAt' in data) || data.updatedAt is timestamp);
+    }
+
+    function validateInventory(data) {
+      return (!('itemName' in data) || (data.itemName is string && data.itemName.size() <= 200))
+             && (!('quantity' in data) || (data.quantity is int && data.quantity >= 0 && data.quantity <= 100000))
+             && (!('weight' in data) || (data.weight is number && data.weight >= 0 && data.weight <= 1000000));
+    }
+
+    function validateActivityLog(data) {
+      return (!('type' in data) || (data.type is string && data.type.size() <= 100))
+             && (!('targetId' in data) || (data.targetId is string && data.targetId.size() <= 200))
+             && (!('description' in data) || (data.description is string && data.description.size() <= 1000))
+             && (!('createdAt' in data) || data.createdAt is timestamp);
+    }
+
+    // Validações para novas coleções top-level
+    function validateQuest(data) {
+      return (data.title is string && data.title.size() > 0)
+             && (!('description' in data) || (data.description is string))
+             && ('levelRequirement' in data ? (data.levelRequirement is int && data.levelRequirement >= 0 && data.levelRequirement <= 30) : true)
+             && ('status' in data ? (data.status is string && (data.status == 'active' || data.status == 'completed' || data.status == 'failed')) : true)
+             && ('reward' in data ? (data.reward is map && ( (!('gold' in data.reward) || data.reward.gold is int) && (!('items' in data.reward) || data.reward.items is list) )) : true)
+             && (!('location' in data) || (data.location is string))
+             && ('ownerId' in data && data.ownerId is string)
+             && (!('createdAt' in data) || data.createdAt is timestamp);
+    }
+
+    function validateJournal(data) {
+      return (data.title is string && data.title.size() > 0)
+             && (!('body' in data) || (data.body is string))
+             && (!('mood' in data) || (data.mood is string))
+             && ('tags' in data ? (data.tags is list) : true)
+             && ('ownerId' in data && data.ownerId is string)
+             && (!('createdAt' in data) || data.createdAt is timestamp);
+    }
+
+    function validateAchievement(data) {
+      return (data.name is string && data.name.size() > 0)
+             && (!('description' in data) || (data.description is string))
+             && ('points' in data ? (data.points is int) : true)
+             && ('achieved' in data ? (data.achieved is bool) : true)
+             && ('ownerId' in data && data.ownerId is string)
+             && (!('createdAt' in data) || data.createdAt is timestamp);
+    }
+
+    // Protege o documento raiz do usuário
+    match /usuarios/{userId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
+      allow delete: if isOwner(userId);
+    }
+
+    // Characters: valida campos esperados e permite apenas owner
+    match /usuarios/{userId}/characters/{docId} {
+      allow create: if isOwner(userId) && validateCharacter(request.resource.data);
+      allow read: if isOwner(userId);
+      allow update: if isOwner(userId) && validateCharacter(request.resource.data);
+      allow delete: if isOwner(userId);
+    }
+
+    // Inventories: validações simples
+    match /usuarios/{userId}/inventories/{docId} {
+      allow create: if isOwner(userId) && validateInventory(request.resource.data);
+      allow read: if isOwner(userId);
+      allow update: if isOwner(userId) && validateInventory(request.resource.data);
+      allow delete: if isOwner(userId);
+    }
+
+    // Activity logs: somente criação + leitura pelo owner; não permitir updates/deletes por cliente
+    match /usuarios/{userId}/activity_logs/{docId} {
+      allow create: if isOwner(userId) && validateActivityLog(request.resource.data);
+      allow read: if isOwner(userId);
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    // Quests as user subcollection
+    match /usuarios/{userId}/quests/{docId} {
+      allow create: if isOwner(userId) && validateQuest(request.resource.data);
+      allow read: if isOwner(userId);
+      allow update: if isOwner(userId) && validateQuest(request.resource.data);
+      allow delete: if isOwner(userId);
+    }
+
+    // Journals as user subcollection
+    match /usuarios/{userId}/journals/{docId} {
+      allow create: if isOwner(userId) && validateJournal(request.resource.data);
+      allow read: if isOwner(userId);
+      allow update: if isOwner(userId) && validateJournal(request.resource.data);
+      allow delete: if isOwner(userId);
+    }
+
+    // Achievements as user subcollection
+    match /usuarios/{userId}/achievements/{docId} {
+      allow create: if isOwner(userId) && validateAchievement(request.resource.data);
+      allow read: if isOwner(userId);
+      allow update: if isOwner(userId) && validateAchievement(request.resource.data);
+      allow delete: if isOwner(userId);
+    }
+
+    // Regras para coleções top-level com ownerId
+    match /quests/{docId} {
+      allow create: if isSignedIn() && request.resource.data.ownerId == request.auth.uid && validateQuest(request.resource.data);
+      allow read: if isSignedIn() && resource.data.ownerId == request.auth.uid;
+      allow update: if isSignedIn() && resource.data.ownerId == request.auth.uid && validateQuest(request.resource.data);
+      allow delete: if isSignedIn() && resource.data.ownerId == request.auth.uid;
+    }
+
+    match /journals/{docId} {
+      allow create: if isSignedIn() && request.resource.data.ownerId == request.auth.uid && validateJournal(request.resource.data);
+      allow read: if isSignedIn() && resource.data.ownerId == request.auth.uid;
+      allow update: if isSignedIn() && resource.data.ownerId == request.auth.uid && validateJournal(request.resource.data);
+      allow delete: if isSignedIn() && resource.data.ownerId == request.auth.uid;
+    }
+
+    match /achievements/{docId} {
+      allow create: if isSignedIn() && request.resource.data.ownerId == request.auth.uid && validateAchievement(request.resource.data);
+      allow read: if isSignedIn() && resource.data.ownerId == request.auth.uid;
+      allow update: if isSignedIn() && resource.data.ownerId == request.auth.uid && validateAchievement(request.resource.data);
+      allow delete: if isSignedIn() && resource.data.ownerId == request.auth.uid;
+    }
+
+    // Negar tudo o mais por padrão
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

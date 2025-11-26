@@ -1,0 +1,41 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "app-rpgo-6061a",
+          "appId": "1:240086523511:android:aeb4c62b28c6d3f31eb072",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "app-rpgo-6061a",
+          "configurations": {
+            "android": "1:240086523511:android:aeb4c62b28c6d3f31eb072",
+            "ios": "1:240086523511:ios:aec277ba5ef4fc5e1eb072",
+            "web": "1:240086523511:web:6de977ec827bcf331eb072"
+          }
+        }
+      }
+    }
+  },
+  "hosting": {
+    "public": "build/web",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+  ,
+  "firestore": {
+    "rules": "firestore.rules"
+  }
+}

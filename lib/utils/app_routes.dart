@@ -17,4 +17,5 @@ class AppRoutes {
   static const startingEquipmentScreen = '/startingEquipmentScreen';
   static const characterSheet = '/characterSheet'; // Nova rota para a ficha final
   static const payment = '/payment'; // Nova rota para pagamento premium
+  static const dndMonsters = '/dndMonsters'; // Rota para lista de monstros DND5e
 }

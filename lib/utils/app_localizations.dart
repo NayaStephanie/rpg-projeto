@@ -195,6 +195,9 @@ class AppLocalizations {
       'aboutVersion': 'Versão',
       'aboutVersionContent': 'Versão atual: 1.0.0\nÚltima atualização: Dezembro 2024\nCompatível com regras D&D 5ª Edição',
       'aboutFooter': 'Que sua jornada seja épica e suas aventuras inesquecíveis!',
+      // Gerenciamento em nuvem
+      'manageCloudCharacters': 'Gerenciar Personagens (Nuvem)',
+      'manageCloudInventory': 'Gerenciar Inventário (Nuvem)',
     },
     'en': {
       // App general
@@ -378,6 +381,9 @@ class AppLocalizations {
       'aboutVersion': 'Version',
       'aboutVersionContent': 'Current version: 1.0.0\nLast update: December 2024\nCompatible with D&D 5th Edition rules',
       'aboutFooter': 'May your journey be epic and your adventures unforgettable!',
+      // Cloud management
+      'manageCloudCharacters': 'Manage Characters (Cloud)',
+      'manageCloudInventory': 'Manage Inventory (Cloud)',
     },
   };
 

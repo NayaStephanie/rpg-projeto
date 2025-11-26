@@ -1,8 +1,10 @@
-// ignore_for_file: deprecated_member_use
+// ignore_for_file: deprecated_member_use, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../utils/app_localizations.dart';
+import '../../services/auth_service.dart';
 
 class RecuperarSenhaScreen extends StatefulWidget {
   const RecuperarSenhaScreen({super.key});
@@ -63,21 +65,23 @@ class _RecuperarSenhaScreenState extends State<RecuperarSenhaScreen> {
   }
 
   void _enviar() {
-    if (_formKey.currentState!.validate()) {
-      _mostrarSnackBar(
-        context,
-        "${_getTranslatedText("recoveryEmailSent")} ${emailController.text}",
-        icone: Icons.email_outlined,
-        cor: Colors.green,
-      );
-    } else {
-      _mostrarSnackBar(
-        context,
-        _getTranslatedText("enterValidEmail"),
-        icone: Icons.warning_amber_rounded,
-        cor: Colors.orange,
-      );
+    if (!_formKey.currentState!.validate()) {
+      _mostrarSnackBar(context, _getTranslatedText("enterValidEmail"), icone: Icons.warning_amber_rounded, cor: Colors.orange);
+      return;
     }
+
+    showDialog(context: context, barrierDismissible: false, builder: (_) => const Center(child: CircularProgressIndicator()));
+
+    AuthService.sendPasswordReset(email: emailController.text.trim()).then((_) {
+      if (mounted) Navigator.of(context).pop();
+      _mostrarSnackBar(context, "${_getTranslatedText("recoveryEmailSent")} ${emailController.text}", icone: Icons.email_outlined, cor: Colors.green);
+    }).catchError((e) {
+      if (mounted) Navigator.of(context).pop();
+      if (kDebugMode) {
+        print('Erro ao enviar email de recuperação: $e');
+      }
+      _mostrarSnackBar(context, 'Não foi possível enviar o email de recuperação. Verifique sua conexão e tente novamente.', icone: Icons.error_outline, cor: Colors.red);
+    });
   }
 
   @override

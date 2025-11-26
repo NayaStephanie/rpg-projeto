@@ -1,8 +1,9 @@
-// ignore_for_file: deprecated_member_use
+// ignore_for_file: deprecated_member_use, use_build_context_synchronously, avoid_print
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:app_rpg/services/subscription_service.dart';
+import 'package:flutter/foundation.dart';
 import 'package:app_rpg/services/language_service.dart';
 import 'package:app_rpg/utils/app_localizations.dart';
 
@@ -19,6 +20,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   int _characterLimit = 2;
   bool _loading = true;
   String _selectedLanguage = 'pt';
+  String _lastAction = '';
 
   String _getTranslatedText(String key) {
     return AppLocalizations.of(context)?.translate(key) ?? key;
@@ -53,12 +55,61 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _upgradeToPremium() async {
-    // Navega para a tela de pagamento
-    final result = await Navigator.pushNamed(context, '/payment');
-    
-    // Se voltou da tela de pagamento, recarrega as configurações
-    if (result == true || mounted) {
-      _loadSettings();
+    // Feedback imediato
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Abrindo pagamento...')));
+    // Marcar ação para diagnóstico visual
+    setState(() {
+      _lastAction = 'upgrade_pressed @ ${DateTime.now().toIso8601String()}';
+    });
+    // Log não condicionado para diagnóstico (aparece mesmo fora de debug)
+    print('ACTION: upgradeToPremium invoked');
+
+    try {
+      final result = await Navigator.pushNamed(context, '/payment');
+      if (kDebugMode) debugPrint('Resultado pushNamed /payment: $result');
+      if (result == true) {
+        if (mounted) _loadSettings();
+        return;
+      }
+    } catch (e) {
+      if (kDebugMode) debugPrint('Navegação para /payment falhou: $e');
+    }
+
+    // Se não veio resultado verdadeiro, mostramos diálogo de simulação com
+    // botões bem visíveis (Português) - garante que o usuário sempre veja algo.
+    final simulate = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF2C1810),
+        title: Text('Pagamento indisponível', style: GoogleFonts.cinzel(color: Colors.amber)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('A tela de pagamento não está disponível neste ambiente.', style: GoogleFonts.cinzel(color: Colors.white70)),
+            const SizedBox(height: 12),
+            Text('Deseja simular o upgrade para Premium (apenas para teste)?', style: GoogleFonts.cinzel(color: Colors.white)),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(context).pop(false), child: Text('Cancelar', style: GoogleFonts.cinzel(color: Colors.white70))),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.amber, foregroundColor: Colors.black),
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text('Simular Upgrade', style: GoogleFonts.cinzel(color: Colors.black)),
+          ),
+        ],
+      ),
+    );
+
+    if (simulate == true) {
+      try {
+        await SubscriptionService.upgradeToPremium();
+        _showSnackBar('Upgrade simulado: agora você é Premium', isError: false);
+        if (mounted) _loadSettings();
+      } catch (e) {
+        if (kDebugMode) debugPrint('Erro ao simular upgrade: $e');
+        _showSnackBar('Erro ao simular upgrade: $e', isError: true);
+      }
     }
   }
 
@@ -189,6 +240,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ),
                         const SizedBox(height: 30),
 
+                        if (_lastAction.isNotEmpty) ...[
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.4),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: Colors.amber.withOpacity(0.3)),
+                            ),
+                            child: Text('Última ação: $_lastAction', style: GoogleFonts.cinzel(color: Colors.amber, fontSize: 12)),
+                          ),
+                          const SizedBox(height: 12),
+                        ],
+
                         // Status da assinatura
                         Container(
                           width: double.infinity,
@@ -230,6 +295,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   color: Colors.white70,
                                   fontSize: 16,
                                 ),
+                              ),
+                              const SizedBox(height: 8),
+                              // Toggle para salvar na nuvem (apenas para usuários premium)
+                              SwitchListTile(
+                                title: Text(
+                                  _getTranslatedText('saveToCloud'),
+                                  style: GoogleFonts.cinzel(color: Colors.white70, fontSize: 14),
+                                ),
+                                value: _storageType == 'cloud',
+                                activeColor: Colors.amber,
+                                onChanged: _isPremium
+                                    ? (bool newVal) async {
+                                        final newType = newVal ? 'cloud' : 'local';
+                                        try {
+                                          await SubscriptionService.setStorageType(newType);
+                                          setState(() {
+                                            _storageType = newType;
+                                            _lastAction = 'storage_changed_to_$newType @ ${DateTime.now().toIso8601String()}';
+                                          });
+                                          _showSnackBar('Opção de armazenamento atualizada: $newType', isError: false);
+                                        } catch (e) {
+                                          if (kDebugMode) debugPrint('Erro ao atualizar storageType: $e');
+                                          _showSnackBar('Erro ao atualizar opção: $e', isError: true);
+                                        }
+                                      }
+                                    : null,
+                                secondary: const Icon(Icons.cloud, color: Colors.amber),
                               ),
                               
                               if (!_isPremium) ...[
@@ -395,6 +487,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               ),
                             ),
                           ),
+                        // Botão de diagnóstico direto: força simulação de upgrade (útil para testes)
+                        const SizedBox(height: 12),
+                        SizedBox(
+                          width: double.infinity,
+                          child: OutlinedButton.icon(
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: Colors.white,
+                              side: BorderSide(color: Colors.amber.withOpacity(0.4)),
+                            ),
+                            onPressed: () async {
+                              setState(() { _lastAction = 'debug_simulate_pressed @ ${DateTime.now().toIso8601String()}'; });
+                              print('ACTION: debug simulate pressed');
+                              try {
+                                await SubscriptionService.upgradeToPremium();
+                                _showSnackBar('Upgrade simulado (debug) aplicado.', isError: false);
+                                if (mounted) _loadSettings();
+                              } catch (e) {
+                                _showSnackBar('Erro ao aplicar upgrade debug: $e', isError: true);
+                              }
+                            },
+                            icon: const Icon(Icons.bug_report, color: Colors.amber),
+                            label: Text('DEBUG: Simular Upgrade', style: GoogleFonts.cinzel(color: Colors.amber)),
+                          ),
+                        ),
                         
                         if (_isPremium) ...[
                           Text(
